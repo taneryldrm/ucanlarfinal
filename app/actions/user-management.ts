@@ -70,3 +70,101 @@ export async function updateUserPassword(userId: string, newPassword: string) {
         };
     }
 }
+
+export async function createUser(userData: any) {
+    try {
+        // 0. Safe Check Env Vars
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+        if (!supabaseUrl || !serviceRoleKey) {
+            console.error("Missing Env Vars: URL or SERVICE_KEY");
+            return { success: false, message: "Sunucu hatası: Yapılandırma eksik." };
+        }
+
+        // 1. Check if the requester is an Admin
+        const supabase = createClient();
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+        if (authError || !user) {
+            return { success: false, message: "Oturum açmanız gerekiyor." };
+        }
+
+        // Check role from profiles
+        const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+
+        if (profileError || profile?.role !== 'sistem yöneticisi') {
+            return { success: false, message: "Bu işlem için yetkiniz yok." };
+        }
+
+        // 2. Create Auth User using Admin Client
+        const supabaseAdmin = createSupabaseClient(supabaseUrl, serviceRoleKey, {
+            auth: {
+                autoRefreshToken: false,
+                persistSession: false
+            }
+        });
+
+        // Parse role for DB
+        const mapRoleToDb = (role: string) => {
+            switch (role) {
+                case 'Yönetici': return 'sistem yöneticisi';
+                case 'Sekreter': return 'sekreter';
+                case 'Saha Sorumlusu': return 'saha sorumlusu';
+                case 'Şoför': return 'şoför';
+                case 'Veri Girici': return 'veri girici';
+                default: return role?.toLowerCase();
+            }
+        };
+
+        const dbRole = mapRoleToDb(userData.role);
+
+        // Create Auth User
+        const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
+            email: userData.email,
+            password: userData.password,
+            email_confirm: true,
+            user_metadata: {
+                full_name: userData.name
+            }
+        });
+
+        if (createError) {
+            console.error("Auth Create Error:", createError);
+            return { success: false, message: "Kullanıcı oluşturulamadı: " + createError.message };
+        }
+
+        if (!newUser.user) {
+            return { success: false, message: "Kullanıcı oluşturuldu ama ID alınamadı." };
+        }
+
+        // 3. Create Profile linked to Auth ID
+        const { error: profileInsertError } = await supabaseAdmin
+            .from('profiles')
+            .insert([{
+                id: newUser.user.id, // LINK TO AUTH ID
+                full_name: userData.name,
+                email: userData.email,
+                role: dbRole,
+                phone: userData.phone || null,
+                status: 'active'
+            }]);
+
+        if (profileInsertError) {
+            console.error("Profile Create Error:", profileInsertError);
+            // Optional: Rollback auth user? 
+            // await supabaseAdmin.auth.admin.deleteUser(newUser.user.id);
+            return { success: false, message: "Profil oluşturulamadı (Veritabanı hatası): " + profileInsertError.message };
+        }
+
+        return { success: true, message: "Kullanıcı başarıyla oluşturuldu." };
+
+    } catch (error: any) {
+        console.error("Unexpected error in createUser:", error);
+        return { success: false, message: "Beklenmeyen hata: " + error.message };
+    }
+}

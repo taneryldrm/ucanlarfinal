@@ -7,7 +7,8 @@ import { NewUserModal } from "@/components/NewUserModal";
 import { cn } from "@/lib/utils";
 import { getProfiles, createProfile, deleteProfile, updateProfile } from "@/lib/supabaseQueries";
 import { toast } from "sonner";
-import { updateUserPassword } from "@/app/actions/user-management";
+import { updateUserPassword, createUser } from "@/app/actions/user-management";
+
 
 const roleStyles: Record<string, string> = {
   "Yönetici": "bg-blue-600 text-white",
@@ -52,29 +53,20 @@ export default function KullanicilarPage() {
         console.log("Updating user:", data.id);
         await updateProfile(data.id, data);
         toast.success("Profil bilgileri güncellendi.");
+        targetUserId = data.id;
       } else {
-        // Create new user (Profile creation is usually handled by Triggers after Auth Sign up, 
-        // BUT if we create profile manually here without Auth user, it's problematic.
-        // Usually Admin creates Auth User first, then Profile.
-        // Since we don't have 'New User' auth creation logic in 'createProfile' (it just inserts to profiles?),
-        // we might be missing the Auth creation step if not handled.
-        // However, assuming 'New User' flow handles Auth creation elsewhere or `createProfile` is just a placeholder...
-        // Wait, looking at `createProfile` in supabaseQueries, it only inserts into `profiles`.
-        // If RLS is on, this might fail if Auth User doesn't exist or we are not Admin.
-        // Assuming the user knows what they are doing.
-
-        // Actually, to create a LOGIN user, we must use Admin Auth Client too.
-        // Let's stick to fixing the PASSWORD update for existing users first as requested.
+        // Create new user (Auth + Profile) using Server Action
+        const result = await createUser(data);
+        if (!result.success) {
+          throw new Error(result.message);
+        }
+        toast.success("Kullanıcı başarıyla oluşturuldu.");
+        // Password set during creation, so no need to call updatePassword again
         isNew = true;
-
-        // For now, if it's just profile data
-        const res = await createProfile(data);
-        targetUserId = res.id; // hypothetical if createProfile returns data
-        toast.success("Kullanıcı profili oluşturuldu.");
       }
 
-      // Handle Password Change (Server Action)
-      if (data.password && targetUserId) {
+      // Handle Password Change (Server Action) - Only for updates
+      if (data.password && targetUserId && !isNew) {
         const result = await updateUserPassword(targetUserId, data.password);
         if (result.success) {
           toast.success("Şifre güncellendi.");
