@@ -1,4 +1,4 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
@@ -13,42 +13,19 @@ export async function middleware(request: NextRequest) {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
             cookies: {
-                get(name: string) {
-                    return request.cookies.get(name)?.value
+                getAll() {
+                    return request.cookies.getAll()
                 },
-                set(name: string, value: string, options: CookieOptions) {
-                    request.cookies.set({
-                        name,
-                        value,
-                        ...options,
-                    })
+                setAll(cookiesToSet) {
+                    cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
                     response = NextResponse.next({
                         request: {
                             headers: request.headers,
                         },
                     })
-                    response.cookies.set({
-                        name,
-                        value,
-                        ...options,
-                    })
-                },
-                remove(name: string, options: CookieOptions) {
-                    request.cookies.set({
-                        name,
-                        value: '',
-                        ...options,
-                    })
-                    response = NextResponse.next({
-                        request: {
-                            headers: request.headers,
-                        },
-                    })
-                    response.cookies.set({
-                        name,
-                        value: '',
-                        ...options,
-                    })
+                    cookiesToSet.forEach(({ name, value, options }) =>
+                        response.cookies.set(name, value, options)
+                    )
                 },
             },
         }
@@ -73,13 +50,7 @@ export async function middleware(request: NextRequest) {
         }
 
         // 4. Role-Based Access Control
-        // Fetch role from profiles table (since user metadata might not be enough or up to date)
-        // Note: Creating a client inside middleware can be tricky purely for data fetching if RLS is involved, 
-        // but here we are 'server' side so we can use the supabase client we just created.
-
-        // Ideally, we should cache this claim in metadata or cookie to avoid DB hit on every request,
-        // but for now, let's fetch it. To avoid performance issues, consider standardizing claims.
-
+        // We fetch the profile to check the role.
         const { data: profile } = await supabase
             .from('profiles')
             .select('role')
@@ -87,23 +58,6 @@ export async function middleware(request: NextRequest) {
             .single()
 
         const userRole = profile?.role;
-
-        // We can't use the 'canAccessRoute' from lib/rbac.ts directly if it uses Node/Browser specifics? 
-        // Actually nextjs middleware runs on Edge, so we need to be careful with imports.
-        // 'lib/rbac.ts' is just data and logic, so it should be fine.
-
-        // BUT we cannot import from modules that use 'fs' or other node APIs. 
-        // Let's implement a simple check here or duplicate the logic if import fails.
-        // Ideally, we import distinct 'rbac-rules.ts' that is edge compatible.
-        // Currently 'lib/rbac.ts' has no dependencies, so it should work.
-
-        // Manual check for now to ensure stability without complex imports if not verified
-        /*
-            Admin: *
-            Data Entry: not /kullanicilar
-            Field Supervisor: not /raporlama, /gelir-gider, /kullanicilar
-            Driver: only /gunluk-program
-        */
 
         const isRestricted = (r: string, p: string) => {
             if (r === 'sistem yöneticisi') return false;
@@ -117,7 +71,7 @@ export async function middleware(request: NextRequest) {
             }
 
             if (r === 'şoför') {
-                // Driver allow list
+                // Driver allow list: Home or Daily Program
                 if (p === '/' || p === '/gunluk-program' || p.startsWith('/gunluk-program')) return false;
                 return true; // Block everything else
             }
@@ -126,13 +80,18 @@ export async function middleware(request: NextRequest) {
         }
 
         if (userRole && isRestricted(userRole, path)) {
-            // Redirect to a safe page or show 403
             // If driver tries to go home '/', redirect to '/gunluk-program'
+            // But wait, allow list says '/' is allowed for driver above?
+            // "if (p === '/' ... return false" -> so isRestricted returns false -> no redirect.
+            // But logic was:
+            // if (userRole === 'şoför' && path === '/') { return NextResponse.redirect(...) }
+            // Let's preserve that specific redirect if needed.
+
             if (userRole === 'şoför' && path === '/') {
                 return NextResponse.redirect(new URL('/gunluk-program', request.url))
             }
 
-            // Otherwise redirect to home which might show "Unauthorized" or simple redirect
+            // General blocking for other restricted paths
             if (path !== '/') {
                 return NextResponse.redirect(new URL('/', request.url))
             }
