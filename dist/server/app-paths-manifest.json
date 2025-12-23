@@ -1,0 +1,22 @@
+{
+  "/_not-found": "app/_not-found.js",
+  "/login/page": "app/login/page.js",
+  "/print/gunluk-kasa/page": "app/print/gunluk-kasa/page.js",
+  "/(dashboard)/ai-randevu/page": "app/(dashboard)/ai-randevu/page.js",
+  "/(dashboard)/gelir-gider/page": "app/(dashboard)/gelir-gider/page.js",
+  "/(dashboard)/bekleyen-tahsilatlar/page": "app/(dashboard)/bekleyen-tahsilatlar/page.js",
+  "/(dashboard)/gunluk-kasa/page": "app/(dashboard)/gunluk-kasa/page.js",
+  "/(dashboard)/is-emirleri/page": "app/(dashboard)/is-emirleri/page.js",
+  "/(dashboard)/debug-rls/page": "app/(dashboard)/debug-rls/page.js",
+  "/(dashboard)/gecmis-arama/page": "app/(dashboard)/gecmis-arama/page.js",
+  "/(dashboard)/kullanicilar/page": "app/(dashboard)/kullanicilar/page.js",
+  "/(dashboard)/page": "app/(dashboard)/page.js",
+  "/(dashboard)/musteriler/[id]/page": "app/(dashboard)/musteriler/[id]/page.js",
+  "/(dashboard)/personel/[id]/page": "app/(dashboard)/personel/[id]/page.js",
+  "/(dashboard)/raporlama/page": "app/(dashboard)/raporlama/page.js",
+  "/(dashboard)/takvim/page": "app/(dashboard)/takvim/page.js",
+  "/(dashboard)/personel-yevmiye/page": "app/(dashboard)/personel-yevmiye/page.js",
+  "/(dashboard)/personel/page": "app/(dashboard)/personel/page.js",
+  "/(dashboard)/musteriler/page": "app/(dashboard)/musteriler/page.js",
+  "/(dashboard)/gunluk-program/page": "app/(dashboard)/gunluk-program/page.js"
+}
