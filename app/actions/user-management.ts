@@ -11,9 +11,13 @@ export async function updateUserPassword(userId: string, newPassword: string) {
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
         const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-        if (!supabaseUrl || !serviceRoleKey) {
-            console.error("Missing Env Vars: URL or SERVICE_KEY");
-            return { success: false, message: "Sunucu hatası: Yapılandırma eksik (Key/URL)." };
+        if (!supabaseUrl) {
+            console.error("Missing Env Var: NEXT_PUBLIC_SUPABASE_URL");
+            return { success: false, message: "Sunucu hatası: NEXT_PUBLIC_SUPABASE_URL eksik." };
+        }
+        if (!serviceRoleKey) {
+            console.error("Missing Env Var: SUPABASE_SERVICE_ROLE_KEY");
+            return { success: false, message: "Sunucu hatası: SUPABASE_SERVICE_ROLE_KEY eksik. Lütfen Hostinger panelinden ekleyin." };
         }
 
         // 1. Check if the requester is an Admin
@@ -77,9 +81,13 @@ export async function createUser(userData: any) {
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
         const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-        if (!supabaseUrl || !serviceRoleKey) {
-            console.error("Missing Env Vars: URL or SERVICE_KEY");
-            return { success: false, message: "Sunucu hatası: Yapılandırma eksik." };
+        if (!supabaseUrl) {
+            console.error("Missing Env Var: NEXT_PUBLIC_SUPABASE_URL");
+            return { success: false, message: "Sunucu hatası: NEXT_PUBLIC_SUPABASE_URL eksik." };
+        }
+        if (!serviceRoleKey) {
+            console.error("Missing Env Var: SUPABASE_SERVICE_ROLE_KEY");
+            return { success: false, message: "Sunucu hatası: SUPABASE_SERVICE_ROLE_KEY eksik." };
         }
 
         // 1. Check if the requester is an Admin
