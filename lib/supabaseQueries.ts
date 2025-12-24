@@ -1,6 +1,6 @@
 
-import { supabase } from './supabase';
-export { supabase };
+import { createClient } from '@/utils/supabase/client';
+export const supabase = createClient();
 
 // Helper: Retry operation
 async function fetchWithRetry<T>(operation: () => Promise<T>, retries = 3, delay = 500): Promise<T> {
