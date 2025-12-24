@@ -17,7 +17,8 @@ export async function updateUserPassword(userId: string, newPassword: string) {
         }
         if (!serviceRoleKey) {
             console.error("Missing Env Var: SUPABASE_SERVICE_ROLE_KEY");
-            return { success: false, message: "Sunucu hatası: SUPABASE_SERVICE_ROLE_KEY eksik. Lütfen Hostinger panelinden ekleyin." };
+            const availableKeys = Object.keys(process.env).filter(k => k.startsWith('NEXT_') || k.startsWith('SUPABASE_') || k === 'NODE_ENV').join(', ');
+            return { success: false, message: `Sunucu hatası: SUPABASE_SERVICE_ROLE_KEY eksik. Mevcut anahtarlar: ${availableKeys}` };
         }
 
         // 1. Check if the requester is an Admin
