@@ -8,8 +8,9 @@ export async function updateUserPassword(userId: string, newPassword: string) {
 
     try {
         // 0. Safe Check Env Vars
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-        const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        // HARDCODED FALLBACK FOR HOSTINGER DEPLOYMENT ISSUE
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://rzcumzfzurthasgptggd.supabase.co";
+        const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6Y3VtemZ6dXJ0aGFzZ3B0Z2dkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NjE0MDkzNiwiZXhwIjoyMDgxNzE2OTM2fQ.khEBONqMDlfciX2UWYtFq5OKpBePBxycg7vvTibhSXU";
 
         if (!supabaseUrl) {
             console.error("Missing Env Var: NEXT_PUBLIC_SUPABASE_URL");
@@ -79,8 +80,9 @@ export async function updateUserPassword(userId: string, newPassword: string) {
 export async function createUser(userData: any) {
     try {
         // 0. Safe Check Env Vars
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-        const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        // HARDCODED FALLBACK FOR HOSTINGER DEPLOYMENT ISSUE
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://rzcumzfzurthasgptggd.supabase.co";
+        const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6Y3VtemZ6dXJ0aGFzZ3B0Z2dkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NjE0MDkzNiwiZXhwIjoyMDgxNzE2OTM2fQ.khEBONqMDlfciX2UWYtFq5OKpBePBxycg7vvTibhSXU";
 
         if (!supabaseUrl) {
             console.error("Missing Env Var: NEXT_PUBLIC_SUPABASE_URL");
