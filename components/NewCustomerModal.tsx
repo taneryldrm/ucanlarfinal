@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Plus } from "lucide-react";
+import { X, Plus, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { createCustomer, updateCustomer } from "@/lib/supabaseQueries";
@@ -19,7 +19,9 @@ export function NewCustomerModal({ isOpen, onClose, initialData, onSuccess }: Ne
     const [type, setType] = useState(initialData?.type || "normal");
     const [phone, setPhone] = useState(initialData?.phone || "");
     const [taxId, setTaxId] = useState(initialData?.taxId || "");
-    const [address, setAddress] = useState("");
+
+    // Changed to array
+    const [addresses, setAddresses] = useState<string[]>([""]);
     const [description, setDescription] = useState("");
 
     // Sync state with initialData when it changes or modal opens
@@ -28,17 +30,62 @@ export function NewCustomerModal({ isOpen, onClose, initialData, onSuccess }: Ne
             setName(initialData?.name || "");
             setType(initialData?.type || "normal");
             setPhone(initialData?.phone || "");
-            setTaxId(initialData?.tax_id || initialData?.taxId || ""); // Handle both cases if DB field is tax_id
-            setAddress(initialData?.address || "");
+            setTaxId(initialData?.tax_id || initialData?.taxId || "");
+
+            // Handle Address: Use address_json (new column)
+            let initialAddresses = [""];
+            const rawAddresses = initialData?.address_json;
+
+            if (rawAddresses) {
+                if (Array.isArray(rawAddresses)) {
+                    initialAddresses = rawAddresses.length > 0 ? rawAddresses.map((a: any) => {
+                        if (typeof a === 'object' && a !== null) return a.address || "";
+                        return String(a);
+                    }) : [""];
+                } else if (typeof rawAddresses === 'string') {
+                    // Should be array but valid text is possible in bad migration state
+                    initialAddresses = [rawAddresses];
+                }
+            } else if (initialData?.address) {
+                // Fallback to legacy address if accessible or present in object
+                if (Array.isArray(initialData.address)) {
+                    initialAddresses = initialData.address.map(String);
+                } else {
+                    initialAddresses = [String(initialData.address)];
+                }
+            }
+            setAddresses(initialAddresses);
+
             setDescription(initialData?.description || "");
+        } else {
+            // Reset when closed (optional but good practice)
+            setAddresses([""]);
         }
     }, [initialData, isOpen]);
+
+    const handleAddAddress = () => {
+        setAddresses([...addresses, ""]);
+    };
+
+    const handleRemoveAddress = (index: number) => {
+        const newAddresses = addresses.filter((_, i) => i !== index);
+        setAddresses(newAddresses.length > 0 ? newAddresses : [""]);
+    };
+
+    const handleAddressChange = (index: number, value: string) => {
+        const newAddresses = [...addresses];
+        newAddresses[index] = value;
+        setAddresses(newAddresses);
+    };
 
     const handleSave = async () => {
         if (!name) {
             toast.error("Müşteri adı zorunludur.");
             return;
         }
+
+        // Filter out empty addresses
+        const validAddresses = addresses.filter(a => a.trim() !== "");
 
         setLoading(true);
         try {
@@ -47,7 +94,7 @@ export function NewCustomerModal({ isOpen, onClose, initialData, onSuccess }: Ne
                 type,
                 phone,
                 taxId,
-                address,
+                addresses: validAddresses, // Send array
                 description
             };
 
@@ -146,15 +193,38 @@ export function NewCustomerModal({ isOpen, onClose, initialData, onSuccess }: Ne
 
                     {/* Adresler */}
                     <div className="space-y-3">
-                        <label className="text-sm font-medium text-slate-700">Adres</label>
-                        <div className="flex gap-2">
-                            <input
-                                type="text"
-                                value={address}
-                                onChange={(e) => setAddress(e.target.value)}
-                                placeholder="Adres girin..."
-                                className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500"
-                            />
+                        <div className="flex items-center justify-between">
+                            <label className="text-sm font-medium text-slate-700">Adresler</label>
+                            <button
+                                type="button"
+                                onClick={handleAddAddress}
+                                className="text-xs font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                            >
+                                <Plus className="h-3 w-3" />
+                                Adres Ekle
+                            </button>
+                        </div>
+                        <div className="space-y-2">
+                            {addresses.map((addr, index) => (
+                                <div key={index} className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value={addr}
+                                        onChange={(e) => handleAddressChange(index, e.target.value)}
+                                        placeholder={`Adres ${index + 1}...`}
+                                        className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500"
+                                    />
+                                    {addresses.length > 1 && (
+                                        <button
+                                            onClick={() => handleRemoveAddress(index)}
+                                            className="p-2.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                            title="Adresi Sil"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
                         </div>
                     </div>
 

@@ -19,7 +19,8 @@ export function WageEditModal({ isOpen, onClose, initialData, onSave }: WageEdit
         devir: 0,
         hakedis: 0,
         odenen: 0,
-        bakiye: 0
+        bakiye: 0,
+        description: "" // Add description
     });
 
     useEffect(() => {
@@ -28,7 +29,8 @@ export function WageEditModal({ isOpen, onClose, initialData, onSave }: WageEdit
                 devir: initialData.devir || 0,
                 hakedis: initialData.hakedis || 0,
                 odenen: initialData.odenen || 0,
-                bakiye: initialData.bakiye || 0
+                bakiye: initialData.bakiye || 0,
+                description: initialData.description || "" // Load description
             });
         }
     }, [initialData]);
@@ -39,9 +41,11 @@ export function WageEditModal({ isOpen, onClose, initialData, onSave }: WageEdit
         setFormData(prev => ({ ...prev, bakiye: newBakiye }));
     }, [formData.devir, formData.hakedis, formData.odenen]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: Number(value) }));
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value, type } = e.target;
+        // If type is number then convert, otherwise keep string
+        const newValue = type === 'number' ? Number(value) : value;
+        setFormData(prev => ({ ...prev, [name]: newValue }));
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -115,6 +119,18 @@ export function WageEditModal({ isOpen, onClose, initialData, onSave }: WageEdit
                                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm">₺</span>
                             </div>
                         </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Açıklama (İsteğe Bağlı)</label>
+                        <textarea
+                            name="description"
+                            value={formData.description}
+                            onChange={handleChange}
+                            rows={2}
+                            placeholder="Bir açıklama girin..."
+                            className="w-full rounded-lg border border-slate-200 py-3 px-4 text-sm font-medium text-slate-700 outline-none focus:border-blue-500 resize-none"
+                        />
                     </div>
 
                     <div className="pt-6 border-t border-slate-100">

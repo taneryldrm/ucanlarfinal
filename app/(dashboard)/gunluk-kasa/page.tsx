@@ -5,6 +5,7 @@ import { Header } from "@/components/Header";
 import { Printer, Calendar, Save, TrendingUp, TrendingDown, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CustomerSelect } from "@/components/CustomerSelect";
+import { useSearchParams, useRouter } from "next/navigation";
 
 // Mock Data for Collections
 const initialCollections: any[] = [];
@@ -20,6 +21,18 @@ export default function GunlukKasaPage() {
   const [todayPaidWages, setTodayPaidWages] = useState(0);
   const [totalWageDebt, setTotalWageDebt] = useState(0);
   const [loading, setLoading] = useState(false);
+
+  // Read URL params ONCE at the top level
+  const searchParams = useSearchParams();
+  const prefillCustomerName = searchParams.get('customerName');
+  const prefillCustomerId = searchParams.get('customerId');
+  const prefillAmount = searchParams.get('amount');
+
+  const prefillData = (prefillCustomerId) ? {
+    customerId: prefillCustomerId,
+    customerName: prefillCustomerName,
+    amount: prefillAmount
+  } : null;
 
   // Enum Mapping Helpers
   const mapPaymentMethodToDb = (uiValue: string) => {
@@ -90,6 +103,8 @@ export default function GunlukKasaPage() {
     .filter(item => item.method === "Nakit")
     .reduce((sum, item) => sum + (item.amount || 0), 0);
 
+  const router = useRouter(); // Add router
+
   // Handlers
   const handleSaveCollection = async (item: any, isNew: boolean, inputValues: any) => {
     try {
@@ -110,6 +125,17 @@ export default function GunlukKasaPage() {
 
       if (isNew) {
         await createCollection(payload);
+
+        // Clear URL params if we just saved a prefilled new record
+        // This prevents the next empty row from auto-filling again
+        if (searchParams.get('customerId')) {
+          const newParams = new URLSearchParams(searchParams.toString());
+          newParams.delete('customerId');
+          newParams.delete('customerName');
+          newParams.delete('amount');
+          router.replace(`/gunluk-kasa?${newParams.toString()}`);
+        }
+
       } else {
         await updateCollection(item.id, { amount: payload.amount }); // Only update amount for now
       }
@@ -248,16 +274,24 @@ export default function GunlukKasaPage() {
                     />
                   ))}
 
+
                   {/* Empty Rows for Adding */}
-                  {collectionRows.map((_, i) => (
-                    <CollectionRow
-                      key={`new-${i}-${collections.length}`}
-                      index={collections.length + i}
-                      isNew
-                      defaultDate={selectedDate}
-                      onSave={(vals: any) => handleSaveCollection(null, true, vals)}
-                    />
-                  ))}
+                  {collectionRows.map((_, i) => {
+                    // Pass prefill data only for the FIRST empty row (i === 0)
+                    // AND if we have prefill data available
+                    const rowPrefill = (i === 0 && prefillData) ? prefillData : null;
+
+                    return (
+                      <CollectionRow
+                        key={`new-${i}-${collections.length}`}
+                        index={collections.length + i}
+                        isNew
+                        defaultDate={selectedDate}
+                        initialValues={rowPrefill}
+                        onSave={(vals: any) => handleSaveCollection(null, true, vals)}
+                      />
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
@@ -363,11 +397,18 @@ export default function GunlukKasaPage() {
 
 // --- Helper Components for Rows (To handle internal state) ---
 import { Trash2 } from "lucide-react";
+// useSearchParams is now used in the parent component, so it's not needed here.
+// import { useSearchParams } from "next/navigation";
 
-function CollectionRow({ index, item, isNew, defaultDate, onSave, onDelete }: any) {
-  const [customer, setCustomer] = useState(item?.customer ? { name: item.customer } : null); // Mock obj if existing
-  const [amount, setAmount] = useState(item?.amount || '');
-  // Date is purely visual/fixed in this context or editable? Existing code showed editable. 
+function CollectionRow({ index, item, isNew, defaultDate, onSave, onDelete, initialValues }: any) {
+  // Use initialValues if provided (for prefilling from URL)
+  const [customer, setCustomer] = useState(
+    item?.customer ? { name: item.customer } :
+      (initialValues?.customerName ? { id: initialValues.customerId, name: initialValues.customerName } : null)
+  );
+
+  const [amount, setAmount] = useState(item?.amount || initialValues?.amount || '');
+  // Date is purely visual/fixed in this context or editable? Existing code showed editable.
   // New logic: For existing items, it's just display usually, but let's keep it 'input' style to match UI.
 
   return (
@@ -375,7 +416,10 @@ function CollectionRow({ index, item, isNew, defaultDate, onSave, onDelete }: an
       <td className="px-3 py-2 text-center text-slate-500 font-medium">{index + 1}</td>
       <td className="px-3 py-2 text-slate-900 font-bold">
         {isNew ? (
-          <CustomerSelect onSelect={setCustomer} />
+          <CustomerSelect
+            onSelect={setCustomer}
+            defaultValue={initialValues?.customerName || ''}
+          />
         ) : (
           item.customer
         )}

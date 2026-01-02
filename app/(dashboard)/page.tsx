@@ -96,12 +96,15 @@ export default function Home() {
         }
 
         // Only load if role is determined (or regardless, but checking role inside makes sense if role is available immediately)
-        // Actually useUserRole might be async initially. 
         // Adding 'role' dependency ensures it refetches or cancels correctly.
-        if (role !== null) { // wait for role to be loaded
+        if (role !== null) {
             loadDashboardData();
+        } else if (!loading && role === null) {
+            // Safety Net: If loading is done but role is null (and we are on a protected page), force login
+            // This catches cases where middleware might have let a "ghost" user through.
+            router.push('/login');
         }
-    }, [role, isDriver]);
+    }, [role, isDriver, loading, router]);
 
     // Handle Click Outside to close search results
     useEffect(() => {

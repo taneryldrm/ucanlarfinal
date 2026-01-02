@@ -106,7 +106,7 @@ export default function BekleyenTahsilatlarPage() {
                                             </td>
                                             <td className="px-4 py-4 text-center">
                                                 <Link
-                                                    href="/gunluk-kasa"
+                                                    href={`/gunluk-kasa?customerId=${item.id}&customerName=${encodeURIComponent(item.name)}&amount=${item.pending}`}
                                                     className="inline-flex items-center justify-center rounded bg-green-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-green-700 transition-colors"
                                                 >
                                                     Tahsil Et

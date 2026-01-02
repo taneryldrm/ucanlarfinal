@@ -137,7 +137,19 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
     const handleSelectCustomer = (customer: any) => {
         setSelectedCustomer(customer);
         setCustomerSearch(customer.name);
-        setAddress(customer.address || "");
+
+        // Handle Address Auto-fill
+        let defaultAddress = "";
+        const rawAddr = customer.address_json || customer.address;
+
+        if (Array.isArray(rawAddr) && rawAddr.length > 0) {
+            const firstAddr = rawAddr[0];
+            defaultAddress = (typeof firstAddr === 'object' && firstAddr !== null) ? (firstAddr.address || "") : String(firstAddr);
+        } else if (rawAddr) {
+            defaultAddress = (typeof rawAddr === 'object' && rawAddr !== null) ? (rawAddr.address || "") : String(rawAddr);
+        }
+        setAddress(defaultAddress);
+
         setShowCustomerResults(false);
     };
 
@@ -199,6 +211,14 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
     };
 
     if (!isOpen) return null;
+
+    // Helper to get available addresses from selected customer
+    const rawCustomerAddresses = selectedCustomer?.address_json || selectedCustomer?.address;
+    const availableAddresses: string[] = rawCustomerAddresses
+        ? (Array.isArray(rawCustomerAddresses)
+            ? rawCustomerAddresses.map((a: any) => typeof a === 'object' && a !== null ? (a.address || JSON.stringify(a)) : String(a))
+            : [typeof rawCustomerAddresses === 'object' ? (rawCustomerAddresses.address || "") : String(rawCustomerAddresses)])
+        : [];
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
@@ -274,7 +294,17 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                                         className="w-full text-left px-4 py-3 hover:bg-slate-50 border-b border-slate-50 last:border-0"
                                     >
                                         <div className="font-bold text-slate-900 text-sm">{customer.name}</div>
-                                        <div className="text-xs text-slate-500">{customer.phone} - {customer.address}</div>
+                                        <div className="text-xs text-slate-500">
+                                            {customer.phone} - {
+                                                (() => {
+                                                    const addr = Array.isArray(customer.address) ? customer.address[0] : customer.address;
+                                                    if (typeof addr === 'object' && addr !== null) {
+                                                        return addr.address || addr.label || JSON.stringify(addr);
+                                                    }
+                                                    return addr;
+                                                })()
+                                            }
+                                        </div>
                                     </button>
                                 ))}
                             </div>
@@ -316,7 +346,7 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                     {/* Personel Seçimi */}
                     <div className="space-y-2">
                         <label className="text-sm font-bold text-slate-900">
-                            Personel Seçimi <span className="text-xs font-normal text-slate-500">(Opsiyonel - sonra düzenleme ile atanabilir)</span>
+                            Personel Seçimi <span className="text-xs font-normal text-slate-500">(Opsiyonel)</span>
                         </label>
                         <div className="rounded-lg border border-slate-200 p-4 space-y-3">
                             <div className="relative mb-3">
@@ -361,7 +391,22 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-bold text-slate-900">Adres</label>
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-bold text-slate-900">Adres</label>
+                                {availableAddresses.length > 1 && (
+                                    <select
+                                        className="text-xs border border-slate-200 rounded px-2 py-1 outline-none focus:border-blue-500 max-w-[150px] truncate"
+                                        onChange={(e) => setAddress(e.target.value)}
+                                        value={""} // Always show placeholder behavior, or manage state properly? 
+                                    // Better: "Adres Seç" option as first
+                                    >
+                                        <option value="" disabled>Kayıtlı Adresler</option>
+                                        {availableAddresses.map((addr, i) => (
+                                            <option key={i} value={addr}>{addr}</option>
+                                        ))}
+                                    </select>
+                                )}
+                            </div>
                             <input
                                 type="text"
                                 value={address}

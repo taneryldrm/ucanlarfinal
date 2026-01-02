@@ -5,6 +5,8 @@ import { Printer, Calendar, Clock, Users, Check, CheckCircle2 } from "lucide-rea
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { getWorkOrders, approveWorkOrder } from "@/lib/supabaseQueries";
+import { useUserRole } from "@/hooks/useUserRole";
+import { hasPermission, PERMISSIONS } from "@/lib/rbac";
 import { toast } from "sonner";
 
 export default function GunlukProgramPage() {
@@ -12,6 +14,10 @@ export default function GunlukProgramPage() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<any>(null);
+
+  const { role } = useUserRole();
+  const canApprove = hasPermission(role || undefined, PERMISSIONS.CAN_APPROVE_WORK_ORDER);
 
   // Fetch logic
   const fetchDailyJobs = async () => {
@@ -66,65 +72,65 @@ export default function GunlukProgramPage() {
 
   return (
     <>
-      <>
-        <div className="print:hidden">
-          <Header title="Günlük Program" />
-          <div className="p-8 space-y-6">
+      <div className="print:hidden">
+        <Header title="Günlük Program" />
+        <div className="p-8 space-y-6">
 
-            {/* Page Header */}
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <h2 className="text-2xl font-bold text-slate-900">Günlük İş Programı</h2>
-              <div className="flex items-center gap-3">
+          {/* ... (Header and Stats sections remain same) ... */}
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <h2 className="text-2xl font-bold text-slate-900">Günlük İş Programı</h2>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => window.print()}
+                className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+              >
+                <Printer className="h-4 w-4" />
+                Yazdır
+              </button>
+              <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-1">
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="px-2 py-1.5 text-sm font-bold text-slate-700 bg-slate-50 rounded border border-slate-200 hover:bg-slate-100 outline-none"
+                />
                 <button
-                  onClick={() => window.print()}
-                  className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                  onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
+                  className="px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded"
                 >
-                  <Printer className="h-4 w-4" />
-                  Yazdır
+                  Bugün
                 </button>
-                <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-1">
-                  <input
-                    type="date"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    className="px-2 py-1.5 text-sm font-bold text-slate-700 bg-slate-50 rounded border border-slate-200 hover:bg-slate-100 outline-none"
-                  />
-                  <button
-                    onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
-                    className="px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded"
-                  >
-                    Bugün
-                  </button>
-                </div>
               </div>
             </div>
+          </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm flex items-center gap-4">
-                <div className="rounded-full bg-blue-50 p-3">
-                  <Clock className="h-8 w-8 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-slate-500">Toplam İş</p>
-                  <h3 className="text-3xl font-bold text-slate-900">{jobs.length}</h3>
-                </div>
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm flex items-center gap-4">
+              <div className="rounded-full bg-blue-50 p-3">
+                <Clock className="h-8 w-8 text-blue-600" />
               </div>
-              <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm flex items-center gap-4">
-                <div className="rounded-full bg-green-50 p-3">
-                  <Users className="h-8 w-8 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-slate-500">Çalışan Personel</p>
-                  <h3 className="text-3xl font-bold text-slate-900">{totalStaff}</h3>
-                </div>
+              <div>
+                <p className="text-sm font-medium text-slate-500">Toplam İş</p>
+                <h3 className="text-3xl font-bold text-slate-900">{jobs.length}</h3>
               </div>
             </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm flex items-center gap-4">
+              <div className="rounded-full bg-green-50 p-3">
+                <Users className="h-8 w-8 text-green-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-slate-500">Çalışan Personel</p>
+                <h3 className="text-3xl font-bold text-slate-900">{totalStaff}</h3>
+              </div>
+            </div>
+          </div>
 
-            {/* Daily Tasks List */}
-            <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-6 min-h-[500px]">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="font-bold text-slate-900">Günün İşleri</h3>
+          {/* Daily Tasks List */}
+          <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-6 min-h-[500px]">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-bold text-slate-900">Günün İşleri</h3>
+              {canApprove && (
                 <button
                   onClick={handleApproveAll}
                   className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition-colors shadow-sm"
@@ -132,145 +138,238 @@ export default function GunlukProgramPage() {
                   <CheckCircle2 className="h-4 w-4" />
                   Hepsini Onayla
                 </button>
-              </div>
+              )}
+            </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead className="text-slate-500 border-b border-slate-100">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="text-slate-500 border-b border-slate-100">
+                  <tr>
+                    <th className="px-4 py-4 font-medium">Müşteri</th>
+                    <th className="px-4 py-4 font-medium">Personel</th>
+                    <th className="px-4 py-4 font-medium">Açıklama</th>
+                    <th className="px-4 py-4 font-medium">Adres</th>
+                    <th className="px-4 py-4 font-medium">Durum</th>
+                    <th className="px-4 py-4 text-right font-medium">İşlemler</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {loading ? (
+                    <tr><td colSpan={6} className="p-8 text-center text-slate-500">Yükleniyor...</td></tr>
+                  ) : jobs.length === 0 ? (
                     <tr>
-                      <th className="px-4 py-4 font-medium">Müşteri</th>
-                      <th className="px-4 py-4 font-medium">Personel</th>
-                      <th className="px-4 py-4 font-medium">Açıklama</th>
-                      <th className="px-4 py-4 font-medium">Adres</th>
-                      <th className="px-4 py-4 font-medium">Durum</th>
-                      <th className="px-4 py-4 text-right font-medium">İşlemler</th>
+                      <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
+                        Seçilen tarihte planlanmış iş bulunmamaktadır.
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {loading ? (
-                      <tr><td colSpan={6} className="p-8 text-center text-slate-500">Yükleniyor...</td></tr>
-                    ) : jobs.length === 0 ? (
-                      <tr>
-                        <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
-                          Seçilen tarihte planlanmış iş bulunmamaktadır.
+                  ) : (
+                    jobs.map((job) => (
+                      <tr
+                        key={job.id}
+                        className="hover:bg-slate-50/50 cursor-pointer"
+                        onClick={() => setSelectedJob(job)}
+                      >
+                        <td className="px-4 py-4 font-bold text-slate-900">{job.customer}</td>
+                        <td className="px-4 py-4">
+                          <span className="inline-block rounded bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700 uppercase">
+                            {job.personnel || 'Belirsiz'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-4 text-slate-800 max-w-[200px] truncate">{job.description}</td>
+                        <td className="px-4 py-4 text-slate-600 font-medium max-w-[200px] truncate">{job.address}</td>
+                        <td className="px-4 py-4">
+                          <span className={cn(
+                            "inline-block px-3 py-1 text-xs font-bold rounded",
+                            job.status === "approved" ? "bg-green-100 text-green-700" :
+                              job.status === "pending" ? "bg-orange-100 text-orange-700" :
+                                "bg-slate-100 text-slate-700"
+                          )}>
+                            {job.status === 'pending' ? 'Onay Bekliyor' :
+                              job.status === 'approved' ? 'Onaylandı' :
+                                job.status}
+                          </span>
+                        </td>
+                        <td className="px-4 py-4">
+                          <div className="flex items-center justify-end" onClick={(e) => e.stopPropagation()}>
+                            {job.status !== "approved" && canApprove && (
+                              <button
+                                onClick={() => handleApprove(job.id)}
+                                className="px-4 py-1.5 rounded border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm"
+                              >
+                                Onayla
+                              </button>
+                            )}
+                            {job.status === "approved" && (
+                              <span className="flex items-center gap-1 text-green-600 text-xs font-bold px-4 py-1.5">
+                                <Check className="h-4 w-4" />
+                                Onaylandı
+                              </span>
+                            )}
+                          </div>
                         </td>
                       </tr>
-                    ) : (
-                      jobs.map((job) => (
-                        <tr key={job.id} className="hover:bg-slate-50/50">
-                          <td className="px-4 py-4 font-bold text-slate-900">{job.customer}</td>
-                          <td className="px-4 py-4">
-                            <span className="inline-block rounded bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700 uppercase">
-                              {job.personnel || 'Belirsiz'}
-                            </span>
-                          </td>
-                          <td className="px-4 py-4 text-slate-800">{job.description}</td>
-                          <td className="px-4 py-4 text-slate-600 font-medium">{job.address}</td>
-                          <td className="px-4 py-4">
-                            <span className={cn(
-                              "inline-block px-3 py-1 text-xs font-bold rounded",
-                              job.status === "approved" ? "bg-green-100 text-green-700" :
-                                job.status === "pending" ? "bg-orange-100 text-orange-700" :
-                                  "bg-slate-100 text-slate-700"
-                            )}>
-                              {job.status === 'pending' ? 'Onay Bekliyor' :
-                                job.status === 'approved' ? 'Onaylandı' :
-                                  job.status}
-                            </span>
-                          </td>
-                          <td className="px-4 py-4">
-                            <div className="flex items-center justify-end">
-                              {job.status !== "approved" && (
-                                <button
-                                  onClick={() => handleApprove(job.id)}
-                                  className="px-4 py-1.5 rounded border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm"
-                                >
-                                  Onayla
-                                </button>
-                              )}
-                              {job.status === "approved" && (
-                                <span className="flex items-center gap-1 text-green-600 text-xs font-bold px-4 py-1.5">
-                                  <Check className="h-4 w-4" />
-                                  Onaylandı
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      )))}
-                  </tbody>
-                </table>
+                    )))}
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      {/* --- DETAIL POPUP MODAL --- */}
+      {
+        selectedJob && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+            <div className="w-full max-w-lg rounded-xl bg-white shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+              <div className="flex items-center justify-between border-b border-slate-100 p-4 bg-slate-50">
+                <h3 className="font-bold text-lg text-slate-900">İş Detayı</h3>
+                <button
+                  onClick={() => setSelectedJob(null)}
+                  className="rounded-lg p-2 text-slate-400 hover:bg-slate-200 hover:text-slate-600 transition-colors"
+                >
+                  <span className="sr-only">Kapat</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M18 6 6 18" /><path d="m6 6 18 18" /></svg>
+                </button>
               </div>
+              <div className="p-6 space-y-4 overflow-y-auto">
+                <div>
+                  <label className="text-xs font-bold text-slate-500 uppercase">Müşteri</label>
+                  <div className="text-base font-bold text-slate-900 mt-1">{selectedJob.customer}</div>
+                  {selectedJob.customer_phone && (
+                    <div className="text-sm text-slate-600">{selectedJob.customer_phone}</div>
+                  )}
+                </div>
 
+                <div>
+                  <label className="text-xs font-bold text-slate-500 uppercase">Personel</label>
+                  <div className="mt-1">
+                    <span className="inline-block rounded bg-slate-100 px-3 py-1 text-sm font-bold text-slate-700 uppercase">
+                      {selectedJob.personnel || 'Belirsiz'}
+                    </span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-500 uppercase">Durum</label>
+                  <div className="mt-1">
+                    <span className={cn(
+                      "inline-block px-3 py-1 text-xs font-bold rounded",
+                      selectedJob.status === "approved" ? "bg-green-100 text-green-700" :
+                        selectedJob.status === "pending" ? "bg-orange-100 text-orange-700" :
+                          "bg-slate-100 text-slate-700"
+                    )}>
+                      {selectedJob.status === 'pending' ? 'Onay Bekliyor' :
+                        selectedJob.status === 'approved' ? 'Onaylandı' :
+                          selectedJob.status}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-lg bg-slate-50 border border-slate-100">
+                  <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2">
+                    Adres
+                  </label>
+                  <div className="text-sm text-slate-800 mt-2 font-medium whitespace-pre-wrap">
+                    {selectedJob.address || '-'}
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-lg bg-slate-50 border border-slate-100">
+                  <label className="text-xs font-bold text-slate-500 uppercase">Açıklama</label>
+                  <div className="text-sm text-slate-800 mt-2 whitespace-pre-wrap">
+                    {selectedJob.description || '-'}
+                  </div>
+                </div>
+              </div>
+              <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-2">
+                <button
+                  onClick={() => setSelectedJob(null)}
+                  className="px-4 py-2 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50"
+                >
+                  Kapat
+                </button>
+                {selectedJob.status !== "approved" && canApprove && (
+                  <button
+                    onClick={() => {
+                      handleApprove(selectedJob.id);
+                      setSelectedJob(null);
+                    }}
+                    className="px-4 py-2 rounded-lg bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 shadow-sm"
+                  >
+                    Onayla
+                  </button>
+                )}
+              </div>
             </div>
+          </div>
+        )
+      }
 
+      {/* --- PRINT VIEW --- */}
+      <div className="hidden print:block p-4 font-sans text-xs bg-white text-black min-h-screen">
+        {/* Header - Top Line */}
+        <div className="flex justify-between border-b border-black pb-2 mb-2 font-bold text-[10px]">
+          <div>
+            <div>VERGI KIMLIK NUMARASI: 8840638625</div>
+            <div>SOYADI (UNVANI): UÇANLAR TEMİZLİK</div>
+          </div>
+          {/* Placeholder for Logo if needed, or just space */}
+          <div className="text-right">
+            <div>MAKINA NO: ........................</div>
+            <div>SIRA NO: ........................</div>
           </div>
         </div>
 
-        {/* --- PRINT VIEW --- */}
-        <div className="hidden print:block p-4 font-sans text-xs bg-white text-black min-h-screen">
-          {/* Header - Top Line */}
-          <div className="flex justify-between border-b border-black pb-2 mb-2 font-bold text-[10px]">
-            <div>
-              <div>VERGI KIMLIK NUMARASI: 8840638625</div>
-              <div>SOYADI (UNVANI): UÇANLAR TEMİZLİK</div>
-            </div>
-            {/* Placeholder for Logo if needed, or just space */}
-            <div className="text-right">
-              <div>MAKINA NO: ........................</div>
-              <div>SIRA NO: ........................</div>
-            </div>
+        {/* Title */}
+        <div className="text-center mb-1">
+          <h1 className="text-sm font-bold uppercase">GÜNÜ MOBİL İŞ PROGRAMI</h1>
+          <div className="text-[10px] font-bold mt-1">
+            Tarih: {selectedDate.split('-').reverse().join('/')}
           </div>
+        </div>
 
-          {/* Title */}
-          <div className="text-center mb-1">
-            <h1 className="text-sm font-bold uppercase">GÜNÜ MOBİL İŞ PROGRAMI</h1>
-            <div className="text-[10px] font-bold mt-1">
-              Tarih: {selectedDate.split('-').reverse().join('/')}
-            </div>
-          </div>
-
-          {/* Table */}
-          <table className="w-full border-collapse border border-black text-[9px] mt-2">
-            <thead>
-              <tr className="bg-gray-100 text-center">
-                <th className="border border-black p-1 w-8">Sıra No</th>
-                <th className="border border-black p-1">Müşteri Ad - Unvan</th>
-                <th className="border border-black p-1 w-20">Müşteri Tel</th>
-                <th className="border border-black p-1">Personel Ad</th>
-                <th className="border border-black p-1 w-48">Yapılacak İş ve Açıklamalar</th>
-                <th className="border border-black p-1">İş Adresi</th>
-                <th className="border border-black p-1 w-16">Ücret</th>
+        {/* Table */}
+        <table className="w-full border-collapse border border-black text-[9px] mt-2">
+          <thead>
+            <tr className="bg-gray-100 text-center">
+              <th className="border border-black p-1 w-8">Sıra No</th>
+              <th className="border border-black p-1">Müşteri Ad - Unvan</th>
+              <th className="border border-black p-1 w-20">Müşteri Tel</th>
+              <th className="border border-black p-1">Personel Ad</th>
+              <th className="border border-black p-1 w-48">Yapılacak İş ve Açıklamalar</th>
+              <th className="border border-black p-1">İş Adresi</th>
+              <th className="border border-black p-1 w-16">Ücret</th>
+            </tr>
+          </thead>
+          <tbody>
+            {jobs.map((job, i) => (
+              <tr key={job.id}>
+                <td className="border border-black p-1 text-center font-bold">{i + 1}</td>
+                <td className="border border-black p-1 font-bold">{job.customer}</td>
+                <td className="border border-black p-1 text-center">{job.customer_phone || '-'}</td>
+                <td className="border border-black p-1 font-bold">{job.personnel}</td>
+                <td className="border border-black p-1">{job.description}</td>
+                <td className="border border-black p-1">{job.address}</td>
+                <td className="border border-black p-1 text-right">{job.amount ? `₺${job.amount}` : '-'}</td>
               </tr>
-            </thead>
-            <tbody>
-              {jobs.map((job, i) => (
-                <tr key={job.id}>
-                  <td className="border border-black p-1 text-center font-bold">{i + 1}</td>
-                  <td className="border border-black p-1 font-bold">{job.customer}</td>
-                  <td className="border border-black p-1 text-center">{job.customer_phone || '-'}</td>
-                  <td className="border border-black p-1 font-bold">{job.personnel}</td>
-                  <td className="border border-black p-1">{job.description}</td>
-                  <td className="border border-black p-1">{job.address}</td>
-                  <td className="border border-black p-1 text-right">{job.amount ? `₺${job.amount}` : '-'}</td>
-                </tr>
-              ))}
-              {/* Fill empty rows to make it look like a full form */}
-              {Array.from({ length: Math.max(0, 25 - jobs.length) }).map((_, i) => (
-                <tr key={`empty-${i}`}>
-                  <td className="border border-black p-1 h-6 text-center">{jobs.length + i + 1}</td>
-                  <td className="border border-black p-1"></td>
-                  <td className="border border-black p-1"></td>
-                  <td className="border border-black p-1"></td>
-                  <td className="border border-black p-1"></td>
-                  <td className="border border-black p-1"></td>
-                  <td className="border border-black p-1"></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </>
+            ))}
+            {/* Fill empty rows to make it look like a full form */}
+            {Array.from({ length: Math.max(0, 25 - jobs.length) }).map((_, i) => (
+              <tr key={`empty-${i}`}>
+                <td className="border border-black p-1 h-6 text-center">{jobs.length + i + 1}</td>
+                <td className="border border-black p-1"></td>
+                <td className="border border-black p-1"></td>
+                <td className="border border-black p-1"></td>
+                <td className="border border-black p-1"></td>
+                <td className="border border-black p-1"></td>
+                <td className="border border-black p-1"></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }

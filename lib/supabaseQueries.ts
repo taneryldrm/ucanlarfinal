@@ -301,6 +301,7 @@ export const getCustomers = async (
 
 // 3. Create Customer
 export const createCustomer = async (customer: any) => {
+    // customer.addresses should be string[]
     const { data, error } = await supabase
         .from('customers')
         .insert([{
@@ -308,7 +309,7 @@ export const createCustomer = async (customer: any) => {
             type: customer.type,
             phone: customer.phone,
             tax_id: customer.taxId,
-            address: customer.address,
+            address_json: customer.addresses, // Now sending array to JSONB column
             description: customer.description
         }])
         .select()
@@ -338,7 +339,7 @@ export const updateCustomer = async (id: string | number, updates: any) => {
             type: updates.type,
             phone: updates.phone,
             tax_id: updates.taxId,
-            address: updates.address,
+            address_json: updates.addresses, // Now sending array to JSONB column
             description: updates.description
         })
         .eq('id', id)
@@ -369,15 +370,30 @@ export const searchGeneral = async (query: string, dateRange?: { start: string, 
         const { data: customers } = await q;
 
         if (customers) {
-            results.push(...customers.map(c => ({
-                id: c.id,
-                source: 'Müşteri',
-                name: c.name,
-                description: `Telefon: ${c.phone || '-'} | Adres: ${c.address || '-'}`,
-                date: c.created_at ? new Date(c.created_at).toLocaleDateString('tr-TR') : '-',
-                amount: '-',
-                extraInfo: `Tip: ${c.type || 'Normal'} | Bakiye: ₺${c.current_balance || 0}`
-            })));
+            results.push(...customers.map(c => {
+                // Handle address display (it might be array now)
+                let addressDisplay = '-';
+                let addressesArray = c.address_json || c.address || [];
+                if (!Array.isArray(addressesArray)) {
+                    addressesArray = [String(addressesArray)];
+                }
+
+                if (addressesArray.length > 0) {
+                    const first = addressesArray[0];
+                    const firstStr = (typeof first === 'object' && first !== null) ? (first.address || JSON.stringify(first)) : String(first);
+                    addressDisplay = firstStr + (addressesArray.length > 1 ? ` (+${addressesArray.length - 1} diğer)` : '');
+                }
+
+                return {
+                    id: c.id,
+                    source: 'Müşteri',
+                    name: c.name,
+                    description: `Telefon: ${c.phone || '-'} | Adres: ${addressDisplay}`,
+                    date: c.created_at ? new Date(c.created_at).toLocaleDateString('tr-TR') : '-',
+                    amount: '-',
+                    extraInfo: `Tip: ${c.type || 'Normal'} | Bakiye: ₺${c.current_balance || 0}`
+                };
+            }));
         }
     }
 
@@ -808,51 +824,78 @@ export const getPendingCollectionsPaginated = async (
     search: string = ''
 ) => {
     // Strategy:
-    // User requested "Pending Collection" = "Future Approved Work".
-    // 1. Get approved work orders where date > today.
-    // 2. Group by customer.
+    // User requested "Pending Collection" -> Should reflect "Net Balance" (Receivables).
+    // Original Logic Scope: Customers with Future Approved Work.
+    // New Logic: For those customers, calculate (Total Debt - Total Paid).
 
     const now = new Date();
     const todayStr = now.toISOString().split('T')[0];
 
-    // Step 1: Get all future approved work orders
+    // Step 1: Get all future approved work orders to identify candidates
     const { data: futureWorkOrders } = await supabase
         .from('work_orders')
-        .select('customer_id, price, date')
+        .select('customer_id, date')
         .gte('date', todayStr) // Today and future
         .eq('status', 'onaylandı'); // Only approved assignments
 
     if (!futureWorkOrders || futureWorkOrders.length === 0) return { data: [], count: 0 };
 
-    // Step 2: Group by customer
-    const customerPendingMap: Record<string, { pending: number, lastDate: string }> = {};
-    const relevantCustomerIds = new Set<string>();
+    const relevantCustomerIds = Array.from(new Set(futureWorkOrders.map(wo => wo.customer_id).filter(Boolean)));
 
-    futureWorkOrders.forEach(wo => {
-        if (wo.customer_id) {
-            if (!customerPendingMap[wo.customer_id]) {
-                customerPendingMap[wo.customer_id] = { pending: 0, lastDate: wo.date };
-            }
-            customerPendingMap[wo.customer_id].pending += (wo.price || 0);
+    if (relevantCustomerIds.length === 0) return { data: [], count: 0 };
 
-            // Keep track of latest date for "Last Transaction" field (or maybe nearest future date?)
-            // Let's use the nearest future date as "Next Transaction" effectively.
-            if (wo.date < customerPendingMap[wo.customer_id].lastDate) {
-                customerPendingMap[wo.customer_id].lastDate = wo.date;
-            }
+    // Step 2: Calculate Balances for these customers
+    // We need to fetch ALL history for these specific customers to get the true balance.
+    // Optimization: Split huge lists if necessary, but assuming reasonable size.
 
-            relevantCustomerIds.add(wo.customer_id);
+    // 2a. Fetch All Work Orders (Debt) for these customers
+    const { data: allWorkOrders } = await supabase
+        .from('work_orders')
+        .select('customer_id, price')
+        .in('customer_id', relevantCustomerIds);
+
+    // 2b. Fetch All Collections (Paid) for these customers
+    const { data: allCollections } = await supabase
+        .from('collections')
+        .select('customer_id, amount')
+        .in('customer_id', relevantCustomerIds);
+
+    // 2c. Calculate Net Balance
+    const balanceMap: Record<string, number> = {};
+    const lastDateMap: Record<string, string> = {}; // Track nearest future date
+
+    // Initialize
+    relevantCustomerIds.forEach(id => {
+        balanceMap[id] = 0;
+        lastDateMap[id] = '9999-12-31';
+    });
+
+    // Sum Debt
+    allWorkOrders?.forEach(wo => {
+        if (balanceMap[wo.customer_id] !== undefined) {
+            balanceMap[wo.customer_id] += (wo.price || 0);
         }
     });
 
-    if (relevantCustomerIds.size === 0) return { data: [], count: 0 };
-    const customerIdArray = Array.from(relevantCustomerIds);
+    // Subtract Paid
+    allCollections?.forEach(c => {
+        if (balanceMap[c.customer_id] !== undefined) {
+            balanceMap[c.customer_id] -= (c.amount || 0);
+        }
+    });
 
-    // Step 3: Fetch Customers
+    // Find nearest future date
+    futureWorkOrders.forEach(wo => {
+        if (wo.customer_id && wo.date < lastDateMap[wo.customer_id]) {
+            lastDateMap[wo.customer_id] = wo.date;
+        }
+    });
+
+    // Step 3: Fetch Customer Details (with Search)
     let customerQuery = supabase
         .from('customers')
         .select('*')
-        .in('id', customerIdArray);
+        .in('id', relevantCustomerIds);
 
     if (search) {
         customerQuery = customerQuery.ilike('name', `%${search}%`);
@@ -862,16 +905,18 @@ export const getPendingCollectionsPaginated = async (
 
     if (!customers) return { data: [], count: 0 };
 
-    // Step 4: Map and Sort
-    const finalResults = customers.map(c => {
-        const info = customerPendingMap[c.id];
-        return {
-            ...c,
-            pending: info.pending,
-            lastTransactionDate: info.lastDate // Showing nearest future date
-        };
-    })
-        .sort((a, b) => b.pending - a.pending);
+    // Step 4: Map, Filter, Sort
+    const finalResults = customers
+        .map(c => {
+            const balance = balanceMap[c.id] || 0;
+            return {
+                ...c,
+                pending: balance,
+                lastTransactionDate: lastDateMap[c.id]
+            };
+        })
+        .filter(c => c.pending > 0) // Only show if they actually owe money
+        .sort((a, b) => b.pending - a.pending); // Sort by highest debt
 
     // Step 5: Paginate
     const totalCount = finalResults.length;

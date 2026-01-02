@@ -45,55 +45,58 @@ export async function middleware(request: NextRequest) {
 
     // 3. Authenticated User Logic
     if (user) {
-        if (path === '/login') {
-            return NextResponse.redirect(new URL('/', request.url))
-        }
-
-        // 4. Role-Based Access Control
-        // We fetch the profile to check the role.
+        // 4. Role & Profile Verification
+        // We fetch the profile to check the role and VALIDITY of the user.
         const { data: profile } = await supabase
             .from('profiles')
             .select('role')
             .eq('id', user.id)
             .single()
 
-        const userRole = profile?.role;
-
-        const isRestricted = (r: string, p: string) => {
-            if (r === 'sistem yöneticisi') return false;
-
-            if (r === 'veri girici') {
-                return p.startsWith('/kullanicilar');
+        // Critical Fix: If user has a session but NO profile, they are "Ghost/Unauthorized" -> Force Login
+        if (!profile) {
+            if (path !== '/login') {
+                return NextResponse.redirect(new URL('/login', request.url))
             }
-
-            if (r === 'saha sorumlusu') {
-                return p.startsWith('/raporlama') || p.startsWith('/gelir-gider') || p.startsWith('/kullanicilar');
-            }
-
-            if (r === 'şoför') {
-                // Driver allow list: Home or Daily Program
-                if (p === '/' || p === '/gunluk-program' || p.startsWith('/gunluk-program')) return false;
-                return true; // Block everything else
-            }
-
-            return false;
-        }
-
-        if (userRole && isRestricted(userRole, path)) {
-            // If driver tries to go home '/', redirect to '/gunluk-program'
-            // But wait, allow list says '/' is allowed for driver above?
-            // "if (p === '/' ... return false" -> so isRestricted returns false -> no redirect.
-            // But logic was:
-            // if (userRole === 'şoför' && path === '/') { return NextResponse.redirect(...) }
-            // Let's preserve that specific redirect if needed.
-
-            if (userRole === 'şoför' && path === '/') {
-                return NextResponse.redirect(new URL('/gunluk-program', request.url))
-            }
-
-            // General blocking for other restricted paths
-            if (path !== '/') {
+            // If they are on /login, let them stay there (don't redirect to home)
+        } else {
+            // User HAS a profile, so they are valid.
+            // If they are on login page, send them home.
+            if (path === '/login') {
                 return NextResponse.redirect(new URL('/', request.url))
+            }
+
+            const userRole = profile.role;
+
+            const isRestricted = (r: string, p: string) => {
+                if (r === 'sistem yöneticisi') return false;
+
+                if (r === 'veri girici') {
+                    return p.startsWith('/kullanicilar');
+                }
+
+                if (r === 'saha sorumlusu') {
+                    return p.startsWith('/raporlama') || p.startsWith('/gelir-gider') || p.startsWith('/kullanicilar');
+                }
+
+                if (r === 'şoför') {
+                    // Driver allow list: Home or Daily Program
+                    if (p === '/' || p === '/gunluk-program' || p.startsWith('/gunluk-program')) return false;
+                    return true; // Block everything else
+                }
+
+                return false;
+            }
+
+            if (userRole && isRestricted(userRole, path)) {
+                if (userRole === 'şoför' && path === '/') {
+                    return NextResponse.redirect(new URL('/gunluk-program', request.url))
+                }
+
+                // General blocking for other restricted paths
+                if (path !== '/') {
+                    return NextResponse.redirect(new URL('/', request.url))
+                }
             }
         }
     }
