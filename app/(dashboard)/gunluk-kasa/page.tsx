@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Header } from "@/components/Header";
 import { Printer, Calendar, Save, TrendingUp, TrendingDown, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -13,7 +13,7 @@ const initialCollections: any[] = [];
 // Mock Data for Expenses
 const initialExpenses: any[] = [];
 
-export default function GunlukKasaPage() {
+function GunlukKasaContent() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [collections, setCollections] = useState<any[]>([]);
   const [expenses, setExpenses] = useState<any[]>([]);
@@ -532,4 +532,12 @@ function ExpenseRow({ index, item, isNew, onSave, onDelete }: any) {
       </td>
     </tr>
   )
+}
+
+export default function GunlukKasaPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center">Yükleniyor...</div>}>
+      <GunlukKasaContent />
+    </Suspense>
+  );
 }
