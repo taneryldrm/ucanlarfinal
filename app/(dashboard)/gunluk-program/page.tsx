@@ -78,25 +78,25 @@ export default function GunlukProgramPage() {
 
           {/* ... (Header and Stats sections remain same) ... */}
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <h2 className="text-2xl font-bold text-foreground">Günlük İş Programı</h2>
+            <h2 className="text-2xl font-bold text-slate-900">Günlük İş Programı</h2>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => window.print()}
-                className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+                className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
               >
                 <Printer className="h-4 w-4" />
                 Yazdır
               </button>
-              <div className="flex items-center gap-2 rounded-lg border border-border bg-card p-1">
+              <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-1">
                 <input
                   type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className="px-2 py-1.5 text-sm font-bold text-foreground bg-muted/50 rounded border border-border hover:bg-muted outline-none"
+                  className="px-2 py-1.5 text-sm font-bold text-slate-700 bg-slate-50 rounded border border-slate-200 hover:bg-slate-100 outline-none"
                 />
                 <button
                   onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
-                  className="px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground rounded"
+                  className="px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded"
                 >
                   Bugün
                 </button>
@@ -106,34 +106,34 @@ export default function GunlukProgramPage() {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm flex items-center gap-4">
-              <div className="rounded-full bg-blue-50 dark:bg-blue-900/20 p-3">
-                <Clock className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+            <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm flex items-center gap-4">
+              <div className="rounded-full bg-blue-50 p-3">
+                <Clock className="h-8 w-8 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Toplam İş</p>
-                <h3 className="text-3xl font-bold text-foreground">{jobs.length}</h3>
+                <p className="text-sm font-medium text-slate-500">Toplam İş</p>
+                <h3 className="text-3xl font-bold text-slate-900">{jobs.length}</h3>
               </div>
             </div>
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm flex items-center gap-4">
-              <div className="rounded-full bg-green-50 dark:bg-green-900/20 p-3">
-                <Users className="h-8 w-8 text-green-600 dark:text-green-400" />
+            <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm flex items-center gap-4">
+              <div className="rounded-full bg-green-50 p-3">
+                <Users className="h-8 w-8 text-green-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Çalışan Personel</p>
-                <h3 className="text-3xl font-bold text-foreground">{totalStaff}</h3>
+                <p className="text-sm font-medium text-slate-500">Çalışan Personel</p>
+                <h3 className="text-3xl font-bold text-slate-900">{totalStaff}</h3>
               </div>
             </div>
           </div>
 
           {/* Daily Tasks List */}
-          <div className="rounded-xl border border-border bg-card shadow-sm p-6 min-h-[500px]">
+          <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-6 min-h-[500px]">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="font-bold text-foreground">Günün İşleri</h3>
+              <h3 className="font-bold text-slate-900">Günün İşleri</h3>
               {canApprove && (
                 <button
                   onClick={handleApproveAll}
-                  className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition-colors shadow-sm shadow-green-200 dark:shadow-none"
+                  className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition-colors shadow-sm"
                 >
                   <CheckCircle2 className="h-4 w-4" />
                   Hepsini Onayla
@@ -143,7 +143,7 @@ export default function GunlukProgramPage() {
 
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="text-muted-foreground border-b border-border">
+                <thead className="text-slate-500 border-b border-slate-100">
                   <tr>
                     <th className="px-4 py-4 font-medium">Müşteri</th>
                     <th className="px-4 py-4 font-medium">Personel</th>
@@ -153,12 +153,12 @@ export default function GunlukProgramPage() {
                     <th className="px-4 py-4 text-right font-medium">İşlemler</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border">
+                <tbody className="divide-y divide-slate-100">
                   {loading ? (
-                    <tr><td colSpan={6} className="p-8 text-center text-muted-foreground">Yükleniyor...</td></tr>
+                    <tr><td colSpan={6} className="p-8 text-center text-slate-500">Yükleniyor...</td></tr>
                   ) : jobs.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
+                      <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
                         Seçilen tarihte planlanmış iş bulunmamaktadır.
                       </td>
                     </tr>
@@ -166,23 +166,23 @@ export default function GunlukProgramPage() {
                     jobs.map((job) => (
                       <tr
                         key={job.id}
-                        className="hover:bg-muted/50 cursor-pointer transition-colors"
+                        className="hover:bg-slate-50/50 cursor-pointer"
                         onClick={() => setSelectedJob(job)}
                       >
-                        <td className="px-4 py-4 font-bold text-foreground">{job.customer}</td>
+                        <td className="px-4 py-4 font-bold text-slate-900">{job.customer}</td>
                         <td className="px-4 py-4">
-                          <span className="inline-block rounded bg-muted/50 px-3 py-1 text-xs font-bold text-muted-foreground uppercase border border-border">
+                          <span className="inline-block rounded bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700 uppercase">
                             {job.personnel || 'Belirsiz'}
                           </span>
                         </td>
-                        <td className="px-4 py-4 text-foreground max-w-[200px] truncate">{job.description}</td>
-                        <td className="px-4 py-4 text-muted-foreground font-medium max-w-[200px] truncate">{job.address}</td>
+                        <td className="px-4 py-4 text-slate-800 max-w-[200px] truncate">{job.description}</td>
+                        <td className="px-4 py-4 text-slate-600 font-medium max-w-[200px] truncate">{job.address}</td>
                         <td className="px-4 py-4">
                           <span className={cn(
                             "inline-block px-3 py-1 text-xs font-bold rounded",
-                            job.status === "approved" ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400" :
-                              job.status === "pending" ? "bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400" :
-                                "bg-muted text-muted-foreground border border-border"
+                            job.status === "approved" ? "bg-green-100 text-green-700" :
+                              job.status === "pending" ? "bg-orange-100 text-orange-700" :
+                                "bg-slate-100 text-slate-700"
                           )}>
                             {job.status === 'pending' ? 'Onay Bekliyor' :
                               job.status === 'approved' ? 'Onaylandı' :
@@ -194,13 +194,13 @@ export default function GunlukProgramPage() {
                             {job.status !== "approved" && canApprove && (
                               <button
                                 onClick={() => handleApprove(job.id)}
-                                className="px-4 py-1.5 rounded border border-border text-xs font-bold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors shadow-sm"
+                                className="px-4 py-1.5 rounded border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm"
                               >
                                 Onayla
                               </button>
                             )}
                             {job.status === "approved" && (
-                              <span className="flex items-center gap-1 text-green-600 dark:text-green-400 text-xs font-bold px-4 py-1.5">
+                              <span className="flex items-center gap-1 text-green-600 text-xs font-bold px-4 py-1.5">
                                 <Check className="h-4 w-4" />
                                 Onaylandı
                               </span>
@@ -221,13 +221,13 @@ export default function GunlukProgramPage() {
       {/* --- DETAIL POPUP MODAL --- */}
       {
         selectedJob && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-            <div className="w-full max-w-lg rounded-xl bg-card border border-border shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-              <div className="flex items-center justify-between border-b border-border p-4 bg-muted/40">
-                <h3 className="font-bold text-lg text-foreground">İş Detayı</h3>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+            <div className="w-full max-w-lg rounded-xl bg-white shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+              <div className="flex items-center justify-between border-b border-slate-100 p-4 bg-slate-50">
+                <h3 className="font-bold text-lg text-slate-900">İş Detayı</h3>
                 <button
                   onClick={() => setSelectedJob(null)}
-                  className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                  className="rounded-lg p-2 text-slate-400 hover:bg-slate-200 hover:text-slate-600 transition-colors"
                 >
                   <span className="sr-only">Kapat</span>
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M18 6 6 18" /><path d="m6 6 18 18" /></svg>
@@ -235,30 +235,30 @@ export default function GunlukProgramPage() {
               </div>
               <div className="p-6 space-y-4 overflow-y-auto">
                 <div>
-                  <label className="text-xs font-bold text-muted-foreground uppercase">Müşteri</label>
-                  <div className="text-base font-bold text-foreground mt-1">{selectedJob.customer}</div>
+                  <label className="text-xs font-bold text-slate-500 uppercase">Müşteri</label>
+                  <div className="text-base font-bold text-slate-900 mt-1">{selectedJob.customer}</div>
                   {selectedJob.customer_phone && (
-                    <div className="text-sm text-muted-foreground">{selectedJob.customer_phone}</div>
+                    <div className="text-sm text-slate-600">{selectedJob.customer_phone}</div>
                   )}
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-muted-foreground uppercase">Personel</label>
+                  <label className="text-xs font-bold text-slate-500 uppercase">Personel</label>
                   <div className="mt-1">
-                    <span className="inline-block rounded bg-muted/50 border border-border px-3 py-1 text-sm font-bold text-muted-foreground uppercase">
+                    <span className="inline-block rounded bg-slate-100 px-3 py-1 text-sm font-bold text-slate-700 uppercase">
                       {selectedJob.personnel || 'Belirsiz'}
                     </span>
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-muted-foreground uppercase">Durum</label>
+                  <label className="text-xs font-bold text-slate-500 uppercase">Durum</label>
                   <div className="mt-1">
                     <span className={cn(
                       "inline-block px-3 py-1 text-xs font-bold rounded",
-                      selectedJob.status === "approved" ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400" :
-                        selectedJob.status === "pending" ? "bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400" :
-                          "bg-muted text-muted-foreground border border-border"
+                      selectedJob.status === "approved" ? "bg-green-100 text-green-700" :
+                        selectedJob.status === "pending" ? "bg-orange-100 text-orange-700" :
+                          "bg-slate-100 text-slate-700"
                     )}>
                       {selectedJob.status === 'pending' ? 'Onay Bekliyor' :
                         selectedJob.status === 'approved' ? 'Onaylandı' :
@@ -267,26 +267,26 @@ export default function GunlukProgramPage() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-lg bg-muted/20 border border-border">
-                  <label className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-2">
+                <div className="p-4 rounded-lg bg-slate-50 border border-slate-100">
+                  <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2">
                     Adres
                   </label>
-                  <div className="text-sm text-foreground mt-2 font-medium whitespace-pre-wrap">
+                  <div className="text-sm text-slate-800 mt-2 font-medium whitespace-pre-wrap">
                     {selectedJob.address || '-'}
                   </div>
                 </div>
 
-                <div className="p-4 rounded-lg bg-muted/20 border border-border">
-                  <label className="text-xs font-bold text-muted-foreground uppercase">Açıklama</label>
-                  <div className="text-sm text-foreground mt-2 whitespace-pre-wrap">
+                <div className="p-4 rounded-lg bg-slate-50 border border-slate-100">
+                  <label className="text-xs font-bold text-slate-500 uppercase">Açıklama</label>
+                  <div className="text-sm text-slate-800 mt-2 whitespace-pre-wrap">
                     {selectedJob.description || '-'}
                   </div>
                 </div>
               </div>
-              <div className="p-4 border-t border-border bg-muted/40 flex justify-end gap-2">
+              <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-2">
                 <button
                   onClick={() => setSelectedJob(null)}
-                  className="px-4 py-2 rounded-lg border border-border bg-card text-sm font-medium text-foreground hover:bg-muted"
+                  className="px-4 py-2 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50"
                 >
                   Kapat
                 </button>
@@ -296,7 +296,7 @@ export default function GunlukProgramPage() {
                       handleApprove(selectedJob.id);
                       setSelectedJob(null);
                     }}
-                    className="px-4 py-2 rounded-lg bg-primary text-sm font-medium text-primary-foreground hover:bg-primary/90 shadow-sm shadow-primary/20 dark:shadow-none"
+                    className="px-4 py-2 rounded-lg bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 shadow-sm"
                   >
                     Onayla
                   </button>

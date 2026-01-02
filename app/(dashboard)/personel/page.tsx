@@ -81,10 +81,10 @@ export default function PersonelPage() {
 
         {/* Page Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-foreground">Personel</h2>
+          <h2 className="text-2xl font-bold text-slate-800">Personel</h2>
           <button
             onClick={handleAddNew}
-            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-primary-foreground transition-colors hover:bg-primary/90 shadow-md shadow-primary/20"
+            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700 shadow-md shadow-blue-200"
           >
             <Plus className="h-4 w-4" />
             Yeni Personel
@@ -92,24 +92,24 @@ export default function PersonelPage() {
         </div>
 
         {/* Content Box */}
-        <div className="rounded-xl border border-border bg-card shadow-sm p-6">
+        <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-6">
 
           {/* Search Bar */}
           <div className="mb-6 max-w-md relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               placeholder="İsim veya telefon ile ara..."
-              className="w-full rounded-lg border border-input bg-background py-2.5 pl-10 pr-4 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-foreground placeholder:text-muted-foreground"
+              className="w-full rounded-lg border border-slate-200 py-2.5 pl-10 pr-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
             />
           </div>
 
           {/* Personnel Table */}
           <div className="overflow-x-auto min-h-[300px]">
             <table className="w-full text-left text-sm">
-              <thead className="text-muted-foreground border-b border-border">
+              <thead className="text-slate-500 border-b border-slate-100">
                 <tr>
                   <th className="px-4 py-4 font-medium">Personel Adı</th>
                   <th className="px-4 py-4 font-medium">Telefon</th>
@@ -118,23 +118,23 @@ export default function PersonelPage() {
                   <th className="px-4 py-4 text-center font-medium">İşlemler</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y divide-slate-100">
                 {loading ? (
-                  <tr><td colSpan={5} className="p-8 text-center text-muted-foreground">Yükleniyor...</td></tr>
+                  <tr><td colSpan={5} className="p-8 text-center text-slate-500">Yükleniyor...</td></tr>
                 ) : personnel.length === 0 ? (
-                  <tr><td colSpan={5} className="p-8 text-center text-muted-foreground">Kayıt bulunamadı.</td></tr>
+                  <tr><td colSpan={5} className="p-8 text-center text-slate-500">Kayıt bulunamadı.</td></tr>
                 ) : (
                   personnel.map((person) => (
-                    <tr key={person.id} className="group hover:bg-muted/50 transition-colors">
-                      <td className="px-4 py-4 font-bold text-foreground uppercase text-xs">{person.full_name || person.name}</td>
-                      <td className="px-4 py-4 font-medium text-foreground text-xs">{person.phone}</td>
-                      <td className="px-4 py-4 text-muted-foreground font-mono text-xs">{person.tc_no || person.tc}</td>
+                    <tr key={person.id} className="group hover:bg-slate-50/50 transition-colors">
+                      <td className="px-4 py-4 font-bold text-slate-800 uppercase text-xs">{person.full_name || person.name}</td>
+                      <td className="px-4 py-4 font-medium text-slate-900 text-xs">{person.phone}</td>
+                      <td className="px-4 py-4 text-slate-600 font-mono text-xs">{person.tc_no || person.tc}</td>
                       <td className="px-4 py-4">
                         <span className={cn(
                           "inline-block rounded px-2 py-0.5 text-[10px] font-bold border",
                           person.status === "Aktif"
-                            ? "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800"
-                            : "bg-muted text-muted-foreground border-border"
+                            ? "bg-green-100 text-green-700 border-green-200"
+                            : "bg-slate-100 text-slate-700 border-slate-200"
                         )}>
                           {person.status || 'Aktif'}
                         </span>
@@ -143,20 +143,20 @@ export default function PersonelPage() {
                         <div className="flex items-center justify-center gap-2">
                           <Link
                             href={`/personel/${person.id}`}
-                            className="rounded p-1.5 text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                            className="rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-blue-600 transition-colors"
                             title="Detay"
                           >
                             <Eye className="h-4 w-4" />
                           </Link>
                           <button
                             onClick={() => handleEdit(person)}
-                            className="rounded p-1.5 text-muted-foreground hover:bg-orange-500/10 hover:text-orange-500 transition-colors"
+                            className="rounded p-1.5 text-slate-400 hover:bg-amber-50 hover:text-amber-600 transition-colors"
                             title="Düzenle">
                             <Pencil className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(person.id)}
-                            className="rounded p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                            className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors"
                             title="Sil">
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -171,22 +171,22 @@ export default function PersonelPage() {
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
-              <div className="text-sm text-muted-foreground">
+            <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
+              <div className="text-sm text-slate-500">
                 Toplam {totalCount} kayıt, Sayfa {page} / {totalPages}
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="flex items-center gap-1 rounded px-3 py-1.5 text-sm font-medium hover:bg-muted text-foreground disabled:opacity-50 disabled:text-muted-foreground"
+                  className="flex items-center gap-1 rounded px-3 py-1.5 text-sm font-medium hover:bg-slate-100 disabled:opacity-50"
                 >
                   <ChevronLeft className="h-4 w-4" /> Önceki
                 </button>
                 <button
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="flex items-center gap-1 rounded px-3 py-1.5 text-sm font-medium hover:bg-muted text-foreground disabled:opacity-50 disabled:text-muted-foreground"
+                  className="flex items-center gap-1 rounded px-3 py-1.5 text-sm font-medium hover:bg-slate-100 disabled:opacity-50"
                 >
                   Sonraki <ChevronRight className="h-4 w-4" />
                 </button>

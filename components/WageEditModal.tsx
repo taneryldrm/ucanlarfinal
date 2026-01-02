@@ -57,18 +57,18 @@ export function WageEditModal({ isOpen, onClose, initialData, onSave }: WageEdit
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-            <div className="w-full max-w-lg bg-card rounded-xl shadow-2xl border border-border animate-in fade-in zoom-in duration-200">
-                <div className="flex items-center justify-between border-b border-border p-4">
-                    <h2 className="text-lg font-bold text-foreground">Yevmiye Düzenle - {initialData?.name}</h2>
-                    <button onClick={onClose} className="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-foreground">
-                        <X className="h-5 w-5" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div className="w-full max-w-lg bg-white rounded-xl shadow-2xl animate-in fade-in zoom-in duration-200">
+                <div className="flex items-center justify-between border-b p-4">
+                    <h2 className="text-lg font-bold text-slate-900">Yevmiye Düzenle - {initialData?.name}</h2>
+                    <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                        <X className="h-5 w-5 text-slate-500" />
                     </button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-8 space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-muted-foreground mb-2">Dünden Devir</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Dünden Devir</label>
                         <div className="relative">
                             <input
                                 type="number"
@@ -76,15 +76,15 @@ export function WageEditModal({ isOpen, onClose, initialData, onSave }: WageEdit
                                 value={formData.devir === 0 ? '' : formData.devir}
                                 placeholder="0"
                                 onChange={handleChange}
-                                className="w-full rounded-lg border border-border py-3 px-4 text-sm font-bold text-muted-foreground bg-muted/50 outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                className="w-full rounded-lg border border-slate-200 py-3 px-4 text-sm font-bold text-slate-600 bg-slate-50 outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
-                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">₺</span>
+                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm">₺</span>
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-muted-foreground mb-2">Bugün Hakediş</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Bugün Hakediş</label>
                             <div className="relative">
                                 <input
                                     type="number"
@@ -94,20 +94,19 @@ export function WageEditModal({ isOpen, onClose, initialData, onSave }: WageEdit
                                     onChange={handleChange}
                                     disabled={!canManageAccruals}
                                     className={cn(
-                                        "w-full rounded-lg border py-3 px-4 text-sm font-bold bg-background outline-none focus:ring-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
-                                        "border-green-200 dark:border-green-800 text-foreground focus:border-green-500 focus:ring-green-500/20 bg-green-50/50 dark:bg-green-900/10",
-                                        !canManageAccruals && "opacity-50 cursor-not-allowed bg-muted border-border text-muted-foreground"
+                                        "w-full rounded-lg border border-slate-200 py-3 px-4 text-sm font-bold text-slate-900 outline-none focus:border-blue-500 bg-green-50/50 border-green-200 focus:border-green-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
+                                        !canManageAccruals && "opacity-50 cursor-not-allowed bg-slate-100 border-slate-200 text-slate-500"
                                     )}
                                 />
-                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">₺</span>
+                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm">₺</span>
                             </div>
                             {!canManageAccruals && (
-                                <p className="text-xs text-destructive mt-1">Yetkiniz yok.</p>
+                                <p className="text-xs text-red-500 mt-1">Yetkiniz yok.</p>
                             )}
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-muted-foreground mb-2">Bugün Ödenen</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Bugün Ödenen</label>
                             <div className="relative">
                                 <input
                                     type="number"
@@ -115,31 +114,31 @@ export function WageEditModal({ isOpen, onClose, initialData, onSave }: WageEdit
                                     value={formData.odenen === 0 ? '' : formData.odenen}
                                     placeholder="0"
                                     onChange={handleChange}
-                                    className="w-full rounded-lg border border-red-200 dark:border-red-800 py-3 px-4 text-sm font-bold text-foreground outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 bg-red-50/50 dark:bg-red-900/10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                    className="w-full rounded-lg border border-slate-200 py-3 px-4 text-sm font-bold text-slate-900 outline-none focus:border-blue-500 bg-red-50/50 border-red-200 focus:border-red-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 />
-                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">₺</span>
+                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm">₺</span>
                             </div>
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-muted-foreground mb-2">Açıklama (İsteğe Bağlı)</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Açıklama (İsteğe Bağlı)</label>
                         <textarea
                             name="description"
                             value={formData.description}
                             onChange={handleChange}
                             rows={2}
                             placeholder="Bir açıklama girin..."
-                            className="w-full rounded-lg border border-input bg-background py-3 px-4 text-sm font-medium text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 resize-none placeholder:text-muted-foreground"
+                            className="w-full rounded-lg border border-slate-200 py-3 px-4 text-sm font-medium text-slate-700 outline-none focus:border-blue-500 resize-none"
                         />
                     </div>
 
-                    <div className="pt-6 border-t border-border">
-                        <div className="flex justify-between items-center bg-muted/40 p-5 rounded-lg border border-border">
-                            <span className="font-bold text-muted-foreground">Yeni Bakiye</span>
+                    <div className="pt-6 border-t border-slate-100">
+                        <div className="flex justify-between items-center bg-slate-50 p-5 rounded-lg border border-slate-200">
+                            <span className="font-bold text-slate-700">Yeni Bakiye</span>
                             <span className={cn(
                                 "text-2xl font-black",
-                                formData.bakiye > 0 ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"
+                                formData.bakiye > 0 ? "text-red-600" : "text-green-600"
                             )}>
                                 ₺{formData.bakiye.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
                             </span>
@@ -150,13 +149,13 @@ export function WageEditModal({ isOpen, onClose, initialData, onSave }: WageEdit
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-6 py-2.5 text-sm font-bold text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg transition-colors border border-transparent hover:border-border"
+                            className="px-6 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
                         >
                             İptal
                         </button>
                         <button
                             type="submit"
-                            className="flex items-center gap-2 px-8 py-2.5 text-sm font-bold text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg transition-colors shadow-sm shadow-primary/20 dark:shadow-none"
+                            className="flex items-center gap-2 px-8 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm shadow-blue-200"
                         >
                             <Save className="h-4 w-4" />
                             Kaydet

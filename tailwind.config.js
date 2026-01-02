@@ -6,7 +6,6 @@ module.exports = {
         "./components/**/*.{js,ts,jsx,tsx,mdx}",
         "./src/**/*.{js,ts,jsx,tsx,mdx}",
     ],
-    darkMode: 'class',
     theme: {
         extend: {
             colors: {
@@ -43,10 +42,6 @@ module.exports = {
                     DEFAULT: "hsl(var(--card))",
                     foreground: "hsl(var(--card-foreground))",
                 },
-                sidebar: {
-                    DEFAULT: "hsl(var(--sidebar-bg))",
-                    foreground: "hsl(var(--sidebar-fg))"
-                }
             },
             borderRadius: {
                 lg: "var(--radius)",

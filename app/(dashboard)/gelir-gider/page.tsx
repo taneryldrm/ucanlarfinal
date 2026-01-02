@@ -87,10 +87,10 @@ export default function GelirGiderPage() {
 
         {/* Page Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-foreground">Gelir / Gider</h2>
+          <h2 className="text-2xl font-bold text-slate-800">Gelir / Gider</h2>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 font-bold text-primary-foreground transition-colors hover:bg-primary/90 shadow-md shadow-primary/20 dark:shadow-none"
+            className="flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 font-bold text-white transition-colors hover:bg-blue-700 shadow-md shadow-blue-200"
           >
             <Plus className="h-5 w-5" />
             Yeni İşlem
@@ -98,20 +98,20 @@ export default function GelirGiderPage() {
         </div>
 
         {/* Filters */}
-        <div className="rounded-xl border border-border bg-card p-4 flex flex-col md:flex-row md:items-center gap-4">
-          <div className="flex items-center gap-2 text-muted-foreground font-medium text-sm">
+        <div className="rounded-xl border border-slate-200 bg-white p-4 flex flex-col md:flex-row md:items-center gap-4">
+          <div className="flex items-center gap-2 text-slate-500 font-medium text-sm">
             <Calendar className="h-4 w-4" />
             <span>Tarih Aralığı:</span>
           </div>
 
-          <div className="flex bg-muted/50 rounded-lg p-1 border border-border">
+          <div className="flex bg-slate-100 rounded-lg p-1">
             <button
               onClick={() => { setFilterType('thisMonth'); setPage(1); }}
               className={cn(
                 "px-4 py-1.5 rounded-md text-sm font-medium transition-all",
                 filterType === 'thisMonth'
-                  ? "bg-primary text-primary-foreground font-bold shadow-sm"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  ? "bg-blue-600 text-white font-bold shadow-sm"
+                  : "text-slate-600 hover:bg-slate-200"
               )}
             >
               Bu Ay
@@ -121,8 +121,8 @@ export default function GelirGiderPage() {
               className={cn(
                 "px-4 py-1.5 rounded-md text-sm font-medium transition-all",
                 filterType === 'allTime'
-                  ? "bg-primary text-primary-foreground font-bold shadow-sm"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  ? "bg-blue-600 text-white font-bold shadow-sm"
+                  : "text-slate-600 hover:bg-slate-200"
               )}
             >
               Tüm Zamanlar
@@ -132,8 +132,8 @@ export default function GelirGiderPage() {
               className={cn(
                 "px-4 py-1.5 rounded-md text-sm font-medium transition-all",
                 filterType === 'custom'
-                  ? "bg-primary text-primary-foreground font-bold shadow-sm"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  ? "bg-blue-600 text-white font-bold shadow-sm"
+                  : "text-slate-600 hover:bg-slate-200"
               )}
             >
               Özel Tarih
@@ -146,19 +146,19 @@ export default function GelirGiderPage() {
                 type="date"
                 value={dateRange.start}
                 onChange={(e) => { setDateRange(prev => ({ ...prev, start: e.target.value })); setPage(1); }}
-                className="px-3 py-1.5 rounded-lg border border-input bg-background/50 text-foreground text-sm outline-none focus:border-ring max-w-[140px]"
+                className="px-3 py-1.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-blue-500 max-w-[140px]"
               />
-              <span className="text-muted-foreground">-</span>
+              <span className="text-slate-400">-</span>
               <input
                 type="date"
                 value={dateRange.end}
                 onChange={(e) => { setDateRange(prev => ({ ...prev, end: e.target.value })); setPage(1); }}
-                className="px-3 py-1.5 rounded-lg border border-input bg-background/50 text-foreground text-sm outline-none focus:border-ring max-w-[140px]"
+                className="px-3 py-1.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-blue-500 max-w-[140px]"
               />
             </div>
           )}
 
-          <span className="text-sm font-bold text-muted-foreground md:ml-auto">
+          <span className="text-sm font-bold text-slate-400 md:ml-auto">
             {getFilterLabel()}
           </span>
         </div>
@@ -166,46 +166,46 @@ export default function GelirGiderPage() {
         {/* Stats Cards - Note: Currently 0 as not fetching aggregations separetely yet */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Income Card */}
-          <div className="bg-green-50 dark:bg-green-900/10 rounded-xl border border-green-100 dark:border-green-800/30 p-6 flex items-center gap-4">
-            <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full text-green-600 dark:text-green-400">
+          <div className="bg-green-50 rounded-xl border border-green-100 p-6 flex items-center gap-4">
+            <div className="p-3 bg-green-100 rounded-full text-green-600">
               <TrendingUp className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-green-700 dark:text-green-400 font-bold text-sm">Genel Gelir</p>
-              <h3 className="text-2xl font-black text-green-700 dark:text-green-300">₺{stats.income.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</h3>
+              <p className="text-green-700 font-bold text-sm">Genel Gelir</p>
+              <h3 className="text-2xl font-black text-green-700">₺{stats.income.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</h3>
             </div>
           </div>
 
           {/* Expense Card */}
-          <div className="bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-800/30 p-6 flex items-center gap-4">
-            <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-full text-red-600 dark:text-red-400">
+          <div className="bg-red-50 rounded-xl border border-red-100 p-6 flex items-center gap-4">
+            <div className="p-3 bg-red-100 rounded-full text-red-600">
               <TrendingDown className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-red-700 dark:text-red-400 font-bold text-sm">Genel Gider</p>
-              <h3 className="text-2xl font-black text-red-700 dark:text-red-300">₺{stats.expense.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</h3>
+              <p className="text-red-700 font-bold text-sm">Genel Gider</p>
+              <h3 className="text-2xl font-black text-red-700">₺{stats.expense.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</h3>
             </div>
           </div>
 
           {/* Balance Card */}
-          <div className="bg-blue-50 dark:bg-blue-900/10 rounded-xl border border-blue-100 dark:border-blue-800/30 p-6 flex items-center gap-4">
-            <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full text-blue-600 dark:text-blue-400">
+          <div className="bg-blue-50 rounded-xl border border-blue-100 p-6 flex items-center gap-4">
+            <div className="p-3 bg-blue-100 rounded-full text-blue-600">
               <DollarSign className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-blue-700 dark:text-blue-400 font-bold text-sm">Net Bakiye</p>
-              <h3 className="text-2xl font-black text-blue-700 dark:text-blue-300">₺{stats.balance.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</h3>
+              <p className="text-blue-700 font-bold text-sm">Net Bakiye</p>
+              <h3 className="text-2xl font-black text-blue-700">₺{stats.balance.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</h3>
             </div>
           </div>
         </div>
 
         {/* Transactions Table */}
-        <div className="rounded-xl border border-border bg-card shadow-sm p-6 min-h-[500px]">
-          <h3 className="text-base font-bold text-foreground mb-6">Tüm İşlemler</h3>
+        <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-6 min-h-[500px]">
+          <h3 className="text-base font-bold text-slate-900 mb-6">Tüm İşlemler</h3>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-card text-muted-foreground border-b border-border">
+              <thead className="bg-white text-slate-500 border-b border-slate-50">
                 <tr>
                   <th className="px-4 py-4 font-medium w-24">Tip</th>
                   <th className="px-4 py-4 font-medium">Ad/Kategori</th>
@@ -217,45 +217,45 @@ export default function GelirGiderPage() {
                   <th className="px-4 py-4 font-medium text-center w-16">İşlem</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y divide-slate-50">
                 {loading ? (
-                  <tr><td colSpan={8} className="p-8 text-center text-muted-foreground">Yükleniyor...</td></tr>
+                  <tr><td colSpan={8} className="p-8 text-center text-slate-500">Yükleniyor...</td></tr>
                 ) : transactions.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-4 py-8 text-center text-muted-foreground italic">
+                    <td colSpan={8} className="px-4 py-8 text-center text-slate-500 italic">
                       Henüz kayıtlı işlem bulunmuyor.
                     </td>
                   </tr>
                 ) : (
                   transactions.map((tx, idx) => (
-                    <tr key={tx.id || idx} className="hover:bg-muted/50 transition-colors">
+                    <tr key={tx.id || idx} className="hover:bg-slate-50/50">
                       <td className="px-4 py-4">
                         <span className={cn(
                           "inline-block w-full text-center py-1 rounded text-xs font-bold",
-                          tx.type === "income" ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400" : "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400"
+                          tx.type === "income" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
                         )}>
                           {tx.type === "income" ? "Gelir" : "Gider"}
                         </span>
                       </td>
-                      <td className="px-4 py-4 font-bold text-foreground">{tx.category || tx.source || '-'}</td>
-                      <td className="px-4 py-4 text-foreground font-medium">{tx.description || '-'}</td>
-                      <td className="px-4 py-4 text-foreground font-bold">{tx.date}</td>
+                      <td className="px-4 py-4 font-bold text-slate-900">{tx.category || tx.source || '-'}</td>
+                      <td className="px-4 py-4 text-slate-700 font-medium">{tx.description || '-'}</td>
+                      <td className="px-4 py-4 text-slate-900 font-bold">{tx.date}</td>
                       <td className="px-4 py-4">
-                        <span className="inline-block px-2 py-0.5 rounded border border-border bg-muted/50 text-xs font-bold text-muted-foreground">
+                        <span className="inline-block px-2 py-0.5 rounded border border-slate-200 bg-slate-50 text-xs font-bold text-slate-600">
                           {tx.method || tx.payment_method || 'Nakit'}
                         </span>
                       </td>
-                      <td className="px-4 py-4 text-muted-foreground">{tx.user || '-'}</td>
+                      <td className="px-4 py-4 text-slate-500">{tx.user || '-'}</td>
                       <td className={cn(
                         "px-4 py-4 text-right font-black",
-                        tx.type === "income" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+                        tx.type === "income" ? "text-green-600" : "text-red-600"
                       )}>
                         {tx.type === "income" ? "+" : "-"}₺{tx.amount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
                       </td>
                       <td className="px-4 py-4 text-center">
                         <button
                           onClick={() => handleDelete(tx)}
-                          className="p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-900/10 text-muted-foreground hover:text-red-500 transition-colors"
+                          className="p-1.5 rounded hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -269,22 +269,22 @@ export default function GelirGiderPage() {
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
-              <div className="text-sm text-muted-foreground">
+            <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
+              <div className="text-sm text-slate-500">
                 Toplam {totalCount} kayıt, Sayfa {page} / {totalPages}
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="flex items-center gap-1 rounded px-3 py-1.5 text-sm font-medium hover:bg-muted hover:text-foreground text-muted-foreground disabled:opacity-50 transition-colors"
+                  className="flex items-center gap-1 rounded px-3 py-1.5 text-sm font-medium hover:bg-slate-100 disabled:opacity-50"
                 >
                   <ChevronLeft className="h-4 w-4" /> Önceki
                 </button>
                 <button
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="flex items-center gap-1 rounded px-3 py-1.5 text-sm font-medium hover:bg-muted hover:text-foreground text-muted-foreground disabled:opacity-50 transition-colors"
+                  className="flex items-center gap-1 rounded px-3 py-1.5 text-sm font-medium hover:bg-slate-100 disabled:opacity-50"
                 >
                   Sonraki <ChevronRight className="h-4 w-4" />
                 </button>

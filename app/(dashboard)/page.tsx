@@ -174,10 +174,10 @@ export default function Home() {
 
                     {/* Dashboard Header Section */}
                     <div className="mb-8 flex items-center justify-between">
-                        <h2 className="text-3xl font-bold text-foreground">Dashboard</h2>
+                        <h2 className="text-3xl font-bold text-slate-800">Dashboard</h2>
                         <Link
                             href="/is-emirleri?new=true"
-                            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700"
                         >
                             <Plus className="h-4 w-4" />
                             Yeni İş Emri
@@ -188,8 +188,8 @@ export default function Home() {
                     <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
 
                         {/* Card 1: Toplam Gelir */}
-                        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-                            <div className="mb-4 text-sm font-medium text-muted-foreground">Toplam Gelir</div>
+                        <div className="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
+                            <div className="mb-4 text-sm font-medium text-slate-500">Toplam Gelir</div>
                             <div className="flex items-end justify-between">
                                 <div className="text-2xl font-bold text-green-600">
                                     ₺{stats.totalIncome.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
@@ -199,8 +199,8 @@ export default function Home() {
                         </div>
 
                         {/* Card 2: Toplam Gider */}
-                        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-                            <div className="mb-4 text-sm font-medium text-muted-foreground">Toplam Gider</div>
+                        <div className="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
+                            <div className="mb-4 text-sm font-medium text-slate-500">Toplam Gider</div>
                             <div className="flex items-end justify-between">
                                 <div className="text-2xl font-bold text-red-600">
                                     ₺{stats.totalExpense.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
@@ -210,8 +210,8 @@ export default function Home() {
                         </div>
 
                         {/* Card 3: Net Kar */}
-                        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-                            <div className="mb-4 text-sm font-medium text-muted-foreground">Net Kar</div>
+                        <div className="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
+                            <div className="mb-4 text-sm font-medium text-slate-500">Net Kar</div>
                             <div className="flex items-end justify-between">
                                 <div className={cn(
                                     "text-2xl font-bold",
@@ -224,8 +224,8 @@ export default function Home() {
                         </div>
 
                         {/* Card 4: Bekleyen Tahsilat */}
-                        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-                            <div className="mb-4 text-sm font-medium text-muted-foreground">Bekleyen Tahsilat</div>
+                        <div className="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
+                            <div className="mb-4 text-sm font-medium text-slate-500">Bekleyen Tahsilat</div>
                             <div className="flex items-end justify-between">
                                 <div className="text-2xl font-bold text-orange-500">
                                     ₺{stats.pendingCollection.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
@@ -237,16 +237,16 @@ export default function Home() {
                     </div>
 
                     {/* Upcoming Jobs List */}
-                    <div className="rounded-xl border border-border bg-card shadow-sm">
-                        <div className="border-b border-border p-6">
-                            <h3 className="flex items-center gap-2 text-lg font-bold text-foreground">
-                                <span className="text-muted-foreground">📅</span> Önümüzdeki 10 Günde Çalışacak Personel
+                    <div className="rounded-xl border border-slate-100 bg-white shadow-sm">
+                        <div className="border-b border-slate-100 p-6">
+                            <h3 className="flex items-center gap-2 text-lg font-bold text-slate-800">
+                                <span className="text-slate-400">📅</span> Önümüzdeki 10 Günde Çalışacak Personel
                             </h3>
                         </div>
 
                         <div className="p-6">
                             {/* Table Header */}
-                            <div className="mb-4 grid grid-cols-12 px-4 text-sm font-medium text-muted-foreground">
+                            <div className="mb-4 grid grid-cols-12 px-4 text-sm font-medium text-slate-500">
                                 <div className="col-span-1">Gün</div>
                                 <div className="col-span-11 md:col-span-5">Tarih</div>
                                 <div className="hidden md:block col-span-3 text-right">İş Emri</div>
@@ -256,38 +256,38 @@ export default function Home() {
                             {/* List Items */}
                             <div className="space-y-2">
                                 {loading ? (
-                                    <div className="text-center py-8 text-muted-foreground">Yükleniyor...</div>
+                                    <div className="text-center py-8 text-slate-400">Yükleniyor...</div>
                                 ) : upcomingDays.length === 0 ? (
-                                    <div className="text-center py-8 text-muted-foreground">Yaklaşan iş bulunamadı.</div>
+                                    <div className="text-center py-8 text-slate-400">Yaklaşan iş bulunamadı.</div>
                                 ) : (
                                     upcomingDays.map((day) => (
                                         <div
                                             key={day.id}
                                             className={cn(
                                                 "grid grid-cols-12 items-center rounded-lg px-4 py-4 transition-colors",
-                                                day.isToday ? "bg-primary/10" : "hover:bg-muted"
+                                                day.isToday ? "bg-blue-50/50" : "hover:bg-slate-50"
                                             )}
                                         >
                                             <div className="col-span-2 md:col-span-1">
                                                 <div className={cn(
                                                     "flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold",
-                                                    day.isToday ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                                                    day.isToday ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-600"
                                                 )}>
                                                     {day.day}
                                                 </div>
                                             </div>
                                             <div className="col-span-10 md:col-span-5 flex items-center gap-2">
                                                 {day.isToday && (
-                                                    <span className="rounded bg-primary/20 px-2 py-0.5 text-xs font-bold text-primary">Bugün</span>
+                                                    <span className="rounded bg-blue-100 px-2 py-0.5 text-xs font-bold text-blue-700">Bugün</span>
                                                 )}
-                                                <span className={cn("font-medium", day.isToday ? "text-foreground" : "text-muted-foreground")}>
+                                                <span className={cn("font-medium", day.isToday ? "text-slate-900" : "text-slate-600")}>
                                                     {day.date}
                                                 </span>
                                             </div>
-                                            <div className="col-span-6 md:col-span-3 text-right text-sm font-medium text-muted-foreground mt-2 md:mt-0">
+                                            <div className="col-span-6 md:col-span-3 text-right text-sm font-medium text-slate-600 mt-2 md:mt-0">
                                                 📄 {day.jobs} iş emri
                                             </div>
-                                            <div className="col-span-6 md:col-span-3 text-right text-sm font-medium text-muted-foreground mt-2 md:mt-0">
+                                            <div className="col-span-6 md:col-span-3 text-right text-sm font-medium text-slate-600 mt-2 md:mt-0">
                                                 👤 {day.personnel} personel
                                             </div>
                                         </div>
@@ -296,37 +296,37 @@ export default function Home() {
                             </div>
                             {/* Fast Customer Search */}
                             <div className="mt-8 relative" ref={searchRef}>
-                                <h3 className="text-sm font-bold text-muted-foreground mb-3 ml-1">Hızlı Müşteri Arama</h3>
+                                <h3 className="text-sm font-bold text-slate-500 mb-3 ml-1">Hızlı Müşteri Arama</h3>
                                 <div className="relative">
-                                    <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                                    <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                                     <input
                                         type="text"
                                         value={searchQuery}
                                         onChange={handleSearch}
                                         placeholder="Müşteri ara..."
-                                        className="w-full rounded-xl border border-border bg-background py-4 pl-12 pr-4 text-base shadow-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-muted-foreground text-foreground"
+                                        className="w-full rounded-xl border border-slate-200 bg-white py-4 pl-12 pr-4 text-base shadow-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-400"
                                     />
                                 </div>
 
                                 {/* Search Dropdown */}
                                 {searchResults.length > 0 && (
-                                    <div className="absolute top-full left-0 right-0 mt-2 bg-card rounded-xl border border-border shadow-xl overflow-hidden z-10 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl border border-slate-100 shadow-xl overflow-hidden z-10 animate-in fade-in slide-in-from-top-2 duration-200">
                                         {searchResults.map((result) => (
                                             <button
                                                 key={result.id}
                                                 onClick={() => router.push(`/musteriler?search=${result.name}`)}
-                                                className="w-full flex items-center justify-between p-4 hover:bg-muted transition-colors border-b border-border last:border-0 text-left"
+                                                className="w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0 text-left"
                                             >
                                                 <div className="flex items-center gap-3">
-                                                    <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-lg">
+                                                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg">
                                                         {result.name.charAt(0)}
                                                     </div>
                                                     <div>
-                                                        <p className="font-bold text-foreground">{result.name}</p>
-                                                        <p className="text-sm text-muted-foreground">{result.phone}</p>
+                                                        <p className="font-bold text-slate-800">{result.name}</p>
+                                                        <p className="text-sm text-slate-500">{result.phone}</p>
                                                     </div>
                                                 </div>
-                                                <div className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded">
+                                                <div className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">
                                                     Detaya Git
                                                 </div>
                                             </button>

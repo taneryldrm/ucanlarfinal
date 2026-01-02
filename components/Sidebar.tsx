@@ -45,22 +45,22 @@ export function Sidebar() {
     const { role, loading } = useUserRole();
 
     return (
-        <div className="flex h-screen w-64 flex-col bg-sidebar text-sidebar-foreground border-r border-border print:hidden transition-colors duration-300">
+        <div className="flex h-screen w-64 flex-col bg-[#0f172a] text-white print:hidden">
             {/* Brand Logo - Updated to match image roughly */}
             <div className="flex items-center gap-3 px-6 py-8">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/20 text-primary">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/20 text-blue-500">
                     <Sparkles className="h-5 w-5" />
                 </div>
                 <div>
                     <h1 className="text-lg font-bold leading-none">Uçanlar</h1>
-                    <p className="text-xs text-muted-foreground">Temizlik Hizmetleri</p>
+                    <p className="text-xs text-slate-400">Temizlik Hizmetleri</p>
                 </div>
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4 scrollbar-thin scrollbar-thumb-muted">
+            <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4 scrollbar-thin scrollbar-thumb-slate-700">
                 {loading ? (
-                    <div className="px-4 text-xs text-muted-foreground">Menü yükleniyor...</div>
+                    <div className="px-4 text-xs text-slate-500">Menü yükleniyor...</div>
                 ) : (
                     menuItems
                         .filter(item => canAccessRoute(role || undefined, item.href))
@@ -73,11 +73,11 @@ export function Sidebar() {
                                     className={cn(
                                         "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                                         isActive
-                                            ? "bg-primary text-primary-foreground shadow-md"
-                                            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                                            ? "bg-blue-600 text-white shadow-lg shadow-blue-900/20"
+                                            : "text-slate-400 hover:bg-slate-800 hover:text-white"
                                     )}
                                 >
-                                    <item.icon className={cn("h-5 w-5", isActive ? "text-primary-foreground" : "text-muted-foreground")} />
+                                    <item.icon className={cn("h-5 w-5", isActive ? "text-white" : "text-slate-400")} />
                                     {item.name}
                                 </Link>
                             );

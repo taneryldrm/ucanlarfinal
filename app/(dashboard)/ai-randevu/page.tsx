@@ -52,8 +52,8 @@ export default function AIRandevuPage() {
       <div className="p-8 space-y-6">
 
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-foreground">AI Randevu Talepleri</h2>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <h2 className="text-2xl font-bold text-slate-800">AI Randevu Talepleri</h2>
+          <div className="flex items-center gap-2 text-sm text-slate-500">
             <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
             WhatsApp Entegrasyonu Aktif
           </div>
@@ -61,38 +61,38 @@ export default function AIRandevuPage() {
 
         <div className="grid grid-cols-1 gap-4">
           {loading ? (
-            <div className="text-center p-12 text-muted-foreground">Yükleniyor...</div>
+            <div className="text-center p-12 text-slate-500">Yükleniyor...</div>
           ) : messages.length === 0 ? (
-            <div className="rounded-xl border border-border bg-card shadow-sm p-12 flex flex-col items-center justify-center text-center">
-              <div className="h-16 w-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-4">
+            <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-12 flex flex-col items-center justify-center text-center">
+              <div className="h-16 w-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mb-4">
                 <MessageSquare className="h-8 w-8" />
               </div>
-              <h3 className="text-lg font-bold text-foreground mb-2">Henüz yeni talep yok</h3>
-              <p className="text-sm text-muted-foreground font-medium">WhatsApp hattından gelen randevu talepleri burada listelenecektir.</p>
+              <h3 className="text-lg font-bold text-slate-700 mb-2">Henüz yeni talep yok</h3>
+              <p className="text-sm text-slate-500 font-medium">WhatsApp hattından gelen randevu talepleri burada listelenecektir.</p>
             </div>
           ) : (
             messages.map((msg) => (
-              <div key={msg.id} className="group relative overflow-hidden rounded-xl border border-border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:border-primary/50">
+              <div key={msg.id} className="group relative overflow-hidden rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:shadow-md hover:border-blue-200">
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
 
                   {/* Icon & Content */}
                   <div className="flex gap-4 flex-1">
-                    <div className="hidden md:flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <div className="hidden md:flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600">
                       <MessageSquare className="h-6 w-6" />
                     </div>
                     <div className="space-y-3 w-full">
                       <div className="flex items-center justify-between md:justify-start gap-3">
-                        <h3 className="font-bold text-foreground text-lg">{msg.sender_name || msg.phone_number || "Bilinmeyen Numara"}</h3>
-                        <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded">
+                        <h3 className="font-bold text-slate-900 text-lg">{msg.sender_name || msg.phone_number || "Bilinmeyen Numara"}</h3>
+                        <span className="text-xs font-medium text-slate-400 bg-slate-100 px-2 py-1 rounded">
                           {msg.created_at ? new Date(msg.created_at).toLocaleString('tr-TR') : 'Tarih Yok'}
                         </span>
                       </div>
-                      <div className="rounded-lg bg-muted/50 p-4 text-foreground text-sm leading-relaxed border border-border">
+                      <div className="rounded-lg bg-slate-50 p-4 text-slate-700 text-sm leading-relaxed border border-slate-100">
                         "{msg.message_content || msg.raw_message}"
                       </div>
-                      <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                      <div className="flex flex-wrap gap-2 text-xs text-slate-500">
                         {msg.phone_number && (
-                          <span className="flex items-center gap-1 bg-card border border-border px-2 py-1 rounded">
+                          <span className="flex items-center gap-1 bg-white border border-slate-200 px-2 py-1 rounded">
                             📱 {msg.phone_number}
                           </span>
                         )}
@@ -104,14 +104,14 @@ export default function AIRandevuPage() {
                   <div className="flex md:flex-col gap-2 shrink-0 w-full md:w-auto mt-4 md:mt-0">
                     <button
                       onClick={() => handleCreateJob(msg)}
-                      className="flex-1 md:flex-none flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 shadow-sm whitespace-nowrap"
+                      className="flex-1 md:flex-none flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-700 shadow-sm whitespace-nowrap"
                     >
                       <CheckCircle2 className="h-4 w-4" />
                       İş Emri Oluştur
                     </button>
                     <button
                       onClick={() => handleDelete(msg.id)}
-                      className="flex-1 md:flex-none flex items-center justify-center gap-2 rounded-lg border border-red-200 dark:border-red-800 bg-card px-4 py-3 text-sm font-bold text-red-600 dark:text-red-400 transition-colors hover:bg-red-50 dark:hover:bg-red-900/10 hover:border-red-300 dark:hover:border-red-700 whitespace-nowrap"
+                      className="flex-1 md:flex-none flex items-center justify-center gap-2 rounded-lg border border-red-200 bg-white px-4 py-3 text-sm font-bold text-red-600 transition-colors hover:bg-red-50 hover:border-red-300 whitespace-nowrap"
                     >
                       <Trash2 className="h-4 w-4" />
                       Sil

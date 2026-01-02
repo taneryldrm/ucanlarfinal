@@ -78,24 +78,24 @@ export default function PersonelYevmiyePage() {
 
         {/* Page Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-foreground">Personel Yevmiye</h2>
+          <h2 className="text-2xl font-bold text-slate-800">Personel Yevmiye</h2>
         </div>
 
         {/* Content Box */}
-        <div className="rounded-xl border border-border bg-card shadow-sm p-6">
+        <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-6">
 
           {/* Filters Bar */}
           <div className="flex flex-col gap-4 mb-6 md:flex-row md:items-center">
 
             {/* Search */}
             <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="İsim ile ara..."
-                className="w-full rounded-lg border border-input bg-background py-2.5 pl-10 pr-4 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-foreground placeholder:text-muted-foreground"
+                className="w-full rounded-lg border border-slate-200 py-2.5 pl-10 pr-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
               />
             </div>
 
@@ -105,9 +105,9 @@ export default function PersonelYevmiyePage() {
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="pl-10 pr-4 py-2.5 rounded-lg border border-input bg-background text-sm font-medium text-foreground outline-none focus:border-ring cursor-pointer"
+                className="pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 outline-none focus:border-blue-500 cursor-pointer"
               />
-              <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 pointer-events-none" />
             </div>
 
             {/* Toggle Balance Only */}
@@ -116,8 +116,8 @@ export default function PersonelYevmiyePage() {
               className={cn(
                 "flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors",
                 showBalanceOnly
-                  ? "bg-primary/10 border-primary text-primary"
-                  : "bg-card border-border text-foreground hover:bg-muted"
+                  ? "bg-blue-50 border-blue-200 text-blue-700"
+                  : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
               )}
             >
               <Filter className="h-4 w-4" />
@@ -129,57 +129,57 @@ export default function PersonelYevmiyePage() {
           {/* Yevmiye Table */}
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="text-muted-foreground border-b border-border">
+              <thead className="text-slate-500 border-b border-slate-100">
                 <tr>
                   <th className="px-4 py-4 font-medium">Ad Soyad</th>
                   <th className="px-4 py-4 font-medium">Telefon</th>
                   <th className="px-4 py-4 font-medium">Bugün Çalıştığı İş</th>
-                  <th className="px-4 py-4 font-bold text-foreground text-right">Devir</th>
-                  <th className="px-4 py-4 font-bold text-foreground text-right">Hakediş</th>
-                  <th className="px-4 py-4 font-bold text-foreground text-right">Ödenen</th>
-                  <th className="px-4 py-4 font-bold text-foreground text-right">Bakiye</th>
+                  <th className="px-4 py-4 font-bold text-slate-700 text-right">Devir</th>
+                  <th className="px-4 py-4 font-bold text-slate-700 text-right">Hakediş</th>
+                  <th className="px-4 py-4 font-bold text-slate-700 text-right">Ödenen</th>
+                  <th className="px-4 py-4 font-bold text-slate-700 text-right">Bakiye</th>
                   <th className="px-4 py-4 text-center font-medium">İşlem</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y divide-slate-100">
                 {loading ? (
                   <tr>
-                    <td colSpan={8} className="text-center py-12 text-muted-foreground">
+                    <td colSpan={8} className="text-center py-12 text-slate-500">
                       <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
                       Yükleniyor...
                     </td>
                   </tr>
                 ) : filteredList.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="text-center py-12 text-muted-foreground">
+                    <td colSpan={8} className="text-center py-12 text-slate-500">
                       Kayıt bulunamadı.
                     </td>
                   </tr>
                 ) : (
                   filteredList.map((person) => (
-                    <tr key={person.id} className="group hover:bg-muted/50 transition-colors">
-                      <td className="px-4 py-4 font-bold text-foreground uppercase text-xs">{person.name}</td>
-                      <td className="px-4 py-4 font-medium text-foreground text-xs">{person.phone || '-'}</td>
-                      <td className="px-4 py-4 text-muted-foreground text-xs">{person.job}</td>
-                      <td className="px-4 py-4 text-right font-bold text-muted-foreground">
+                    <tr key={person.id} className="group hover:bg-slate-50/50 transition-colors">
+                      <td className="px-4 py-4 font-bold text-slate-800 uppercase text-xs">{person.name}</td>
+                      <td className="px-4 py-4 font-medium text-slate-900 text-xs">{person.phone || '-'}</td>
+                      <td className="px-4 py-4 text-slate-600 text-xs">{person.job}</td>
+                      <td className="px-4 py-4 text-right font-bold text-slate-600">
                         ₺{person.devir.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
                       </td>
-                      <td className="px-4 py-4 text-right font-bold text-green-600 dark:text-green-400">
+                      <td className="px-4 py-4 text-right font-bold text-green-600">
                         ₺{person.hakedis.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
                       </td>
-                      <td className="px-4 py-4 text-right font-bold text-red-600 dark:text-red-400">
+                      <td className="px-4 py-4 text-right font-bold text-red-600">
                         ₺{person.odenen.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
                       </td>
                       <td className={cn(
                         "px-4 py-4 text-right font-black",
-                        person.bakiye > 0 ? "text-red-700 dark:text-red-400" : "text-foreground"
+                        person.bakiye > 0 ? "text-red-700" : "text-slate-900"
                       )}>
                         ₺{person.bakiye.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
                       </td>
                       <td className="px-4 py-4 text-center">
                         <button
                           onClick={() => handleEdit(person)}
-                          className="rounded border border-border px-3 py-1 text-xs font-bold text-muted-foreground hover:bg-muted hover:text-foreground transform active:scale-95 transition-all"
+                          className="rounded border border-slate-200 px-3 py-1 text-xs font-bold text-slate-700 hover:bg-slate-50 transform active:scale-95 transition-all"
                         >
                           Düzenle
                         </button>
