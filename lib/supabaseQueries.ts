@@ -321,8 +321,75 @@ export const createCustomer = async (customer: any) => {
 
 // 4. Delete Customer
 export const deleteCustomer = async (id: string | number) => {
+    // 1. Delete Collections
+    const { error: colError } = await supabase
+        .from('collections')
+        .delete()
+        .eq('customer_id', id);
+
+    if (colError) {
+        console.error("Error deleting customer collections:", colError);
+        throw colError;
+    }
+
+    // 2. Delete Work Orders (and their assignments)
+    // First, find work orders to delete their assignments
+    const { data: workOrders } = await supabase
+        .from('work_orders')
+        .select('id')
+        .eq('customer_id', id);
+
+    if (workOrders && workOrders.length > 0) {
+        const workOrderIds = workOrders.map(w => w.id);
+
+        // Delete assignments for these work orders
+        const { error: assignError } = await supabase
+            .from('work_order_assignments')
+            .delete()
+            .in('work_order_id', workOrderIds);
+
+        if (assignError) {
+            console.error("Error deleting customer WO assignments:", assignError);
+            throw assignError;
+        }
+
+        // Delete work orders
+        const { error: woError } = await supabase
+            .from('work_orders')
+            .delete()
+            .in('id', workOrderIds);
+
+        if (woError) {
+            console.error("Error deleting customer work orders:", woError);
+            throw woError;
+        }
+    }
+
+    // 3. Delete Customer
     const { error } = await supabase
         .from('customers')
+        .delete()
+        .eq('id', id);
+
+    if (error) throw error;
+    return true;
+};
+
+export const deleteWorkOrder = async (id: string | number) => {
+    // 1. Delete assignments
+    const { error: assignError } = await supabase
+        .from('work_order_assignments')
+        .delete()
+        .eq('work_order_id', id);
+
+    if (assignError) {
+        console.error("Error deleting work order assignments:", assignError);
+        throw assignError;
+    }
+
+    // 2. Delete work order
+    const { error } = await supabase
+        .from('work_orders')
         .delete()
         .eq('id', id);
 

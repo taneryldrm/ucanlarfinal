@@ -58,12 +58,12 @@ function IsEmirleriContent() {
   const handleDelete = async (id: number) => {
     if (confirm("Bu iş emrini silmek istediğinize emin misiniz?")) {
       try {
-        const { error } = await supabase.from('work_orders').delete().eq('id', id);
-        if (error) throw error;
+        const { deleteWorkOrder } = await import("@/lib/supabaseQueries");
+        await deleteWorkOrder(id);
         fetchJobs();
       } catch (err) {
         console.error(err);
-        alert("Silinemedi.")
+        alert("Silinemedi: " + (err as any).message)
       }
     }
   };

@@ -71,7 +71,7 @@ export default function MusterilerPage() {
         // But better to add toast keying off previous patterns.
       } catch (error) {
         console.error("Error deleting customer:", error);
-        alert("Silme işlemi başarısız oldu.");
+        alert("Silme işlemi başarısız oldu: " + (error as any).message);
       }
     }
   };
