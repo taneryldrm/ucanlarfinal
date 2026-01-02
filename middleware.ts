@@ -18,11 +18,6 @@ export async function middleware(request: NextRequest) {
                 },
                 setAll(cookiesToSet) {
                     cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
-                    response = NextResponse.next({
-                        request: {
-                            headers: request.headers,
-                        },
-                    })
                     cookiesToSet.forEach(({ name, value, options }) =>
                         response.cookies.set(name, value, options)
                     )
@@ -39,14 +34,24 @@ export async function middleware(request: NextRequest) {
     const path = request.nextUrl.pathname
 
     // 2. Protect Authenticated Routes
-    if (!user && path !== '/login' && !path.startsWith('/_next') && !path.includes('.')) {
-        return NextResponse.redirect(new URL('/login', request.url))
+    const isLoginPage = path === '/login';
+    const isRootPage = path === '/';
+
+    // If user is NOT authenticated:
+    if (!user) {
+        // If they are on a protected page (like root), redirect to login
+        if (!isLoginPage && !path.startsWith('/_next') && !path.includes('.')) {
+            const url = request.nextUrl.clone()
+            url.pathname = '/login'
+            return NextResponse.redirect(url)
+        }
+        // If they are on login page, let them pass
+        return response;
     }
 
     // 3. Authenticated User Logic
     if (user) {
         // 4. Role & Profile Verification
-        // We fetch the profile to check the role and VALIDITY of the user.
         const { data: profile } = await supabase
             .from('profiles')
             .select('role')
@@ -55,18 +60,22 @@ export async function middleware(request: NextRequest) {
 
         // Critical Fix: If user has a session but NO profile, they are "Ghost/Unauthorized" -> Force Login
         if (!profile) {
-            if (path !== '/login') {
-                return NextResponse.redirect(new URL('/login', request.url))
+            if (!isLoginPage) {
+                const url = request.nextUrl.clone()
+                url.pathname = '/login'
+                return NextResponse.redirect(url)
             }
             // If they are on /login, let them stay there (don't redirect to home)
         } else {
             // User HAS a profile, so they are valid.
-            // If they are on login page, send them home.
-            if (path === '/login') {
-                return NextResponse.redirect(new URL('/', request.url))
-            }
-
             const userRole = profile.role;
+
+            // If they are on login page, send them home.
+            if (isLoginPage) {
+                const url = request.nextUrl.clone()
+                url.pathname = '/'
+                return NextResponse.redirect(url)
+            }
 
             const isRestricted = (r: string, p: string) => {
                 if (r === 'sistem yöneticisi') return false;
@@ -90,22 +99,20 @@ export async function middleware(request: NextRequest) {
 
             if (userRole && isRestricted(userRole, path)) {
                 if (userRole === 'şoför' && path === '/') {
-                    return NextResponse.redirect(new URL('/gunluk-program', request.url))
+                    const url = request.nextUrl.clone()
+                    url.pathname = '/gunluk-program'
+                    return NextResponse.redirect(url)
                 }
 
                 // General blocking for other restricted paths
                 if (path !== '/') {
-                    return NextResponse.redirect(new URL('/', request.url))
+                    const url = request.nextUrl.clone()
+                    url.pathname = '/'
+                    return NextResponse.redirect(url)
                 }
             }
         }
     }
-
-    // Prevent caching of the response to avoid RSC payload leaks
-    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    response.headers.set('Pragma', 'no-cache');
-    response.headers.set('Expires', '0');
-    response.headers.set('Vary', 'Accept-Encoding, RSC, Next-Router-State-Tree, Next-Url, x-nextjs-data');
 
     return response
 }
@@ -117,7 +124,7 @@ export const config = {
          * - _next/static (static files)
          * - _next/image (image optimization files)
          * - favicon.ico (favicon file)
-         * Feel free to modify this pattern to include more paths.
+         * - public folder content
          */
         '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
     ],
