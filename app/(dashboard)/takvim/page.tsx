@@ -101,32 +101,32 @@ export default function TakvimPage() {
       <Header title="Takvim" />
       <div className="p-8 space-y-6">
 
-        <h2 className="text-2xl font-bold text-slate-800">Personel Takvimi</h2>
+        <h2 className="text-2xl font-bold text-foreground">Personel Takvimi</h2>
 
         {/* Calendar Container */}
-        <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-6">
+        <div className="rounded-xl border border-border bg-card shadow-sm p-6">
 
           {/* Calendar Header */}
           <div className="flex items-center justify-between mb-8">
             <button
               onClick={handlePrevMonth}
-              className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-muted rounded-lg transition-colors"
             >
-              <ChevronLeft className="h-5 w-5 text-slate-500" />
+              <ChevronLeft className="h-5 w-5 text-muted-foreground" />
             </button>
-            <h3 className="text-lg font-bold text-slate-900 capitalize">{formatMonthYear(currentDate)}</h3>
+            <h3 className="text-lg font-bold text-foreground capitalize">{formatMonthYear(currentDate)}</h3>
             <button
               onClick={handleNextMonth}
-              className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-muted rounded-lg transition-colors"
             >
-              <ChevronRight className="h-5 w-5 text-slate-500" />
+              <ChevronRight className="h-5 w-5 text-muted-foreground" />
             </button>
           </div>
 
           {/* Days Header */}
           <div className="grid grid-cols-7 mb-4">
             {["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"].map((day) => (
-              <div key={day} className="text-center text-sm font-medium text-slate-500 py-2">
+              <div key={day} className="text-center text-sm font-medium text-muted-foreground py-2">
                 {day}
               </div>
             ))}
@@ -150,23 +150,23 @@ export default function TakvimPage() {
                   className={cn(
                     "min-h-[100px] rounded-xl border p-2 transition-all cursor-pointer relative",
                     pCount > 0
-                      ? "bg-white border-slate-200 hover:border-blue-300 hover:shadow-md"
-                      : "bg-slate-50/50 border-slate-100 text-slate-400"
+                      ? "bg-card border-border hover:border-primary/50 hover:shadow-md dark:shadow-none"
+                      : "bg-muted/30 border-border text-muted-foreground"
                   )}
                 >
                   <span className={cn(
                     "text-sm font-semibold block mb-2",
-                    pCount > 0 ? "text-slate-700" : "text-slate-400"
+                    pCount > 0 ? "text-foreground" : "text-muted-foreground"
                   )}>{day}</span>
 
                   {pCount > 0 && (
-                    <div className="bg-blue-50 border border-blue-100 rounded-lg p-2 flex items-center gap-2">
-                      <div className="bg-blue-100 p-1.5 rounded-md">
-                        <Users className="h-3 w-3 text-blue-600" />
+                    <div className="bg-primary/10 border border-primary/20 rounded-lg p-2 flex items-center gap-2">
+                      <div className="bg-primary/20 p-1.5 rounded-md">
+                        <Users className="h-3 w-3 text-primary" />
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-xs font-bold text-blue-900 leading-none">{pCount}</span>
-                        <span className="text-[10px] font-medium text-blue-600 leading-none mt-0.5">Personel</span>
+                        <span className="text-xs font-bold text-foreground leading-none">{pCount}</span>
+                        <span className="text-[10px] font-medium text-primary leading-none mt-0.5">Personel</span>
                       </div>
                     </div>
                   )}

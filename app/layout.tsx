@@ -10,6 +10,8 @@ export const metadata: Metadata = {
     description: "Uçanlar Temizlik Hizmetleri Yönetim Sistemi",
 };
 
+import { ThemeProvider } from "@/components/theme-provider";
+
 export default function RootLayout({
     children,
 }: Readonly<{
@@ -18,8 +20,10 @@ export default function RootLayout({
     return (
         <html lang="tr">
             <body className={inter.className}>
-                {children}
-                <Toaster position="top-right" />
+                <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+                    {children}
+                    <Toaster position="top-right" />
+                </ThemeProvider>
             </body>
         </html>
     );

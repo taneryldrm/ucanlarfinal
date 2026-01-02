@@ -217,25 +217,25 @@ function GunlukKasaContent() {
 
         {/* Page Header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <h2 className="text-2xl font-bold text-slate-800">Günlük Kasa</h2>
+          <h2 className="text-2xl font-bold text-foreground">Günlük Kasa</h2>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-1">
+            <div className="flex items-center gap-2 rounded-lg border border-border bg-card p-1">
               <input
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="px-2 py-1.5 text-sm font-bold text-slate-700 bg-slate-50 rounded border border-slate-200 hover:bg-slate-100 outline-none"
+                className="px-2 py-1.5 text-sm font-bold text-foreground bg-muted/50 rounded border border-border hover:bg-muted outline-none"
               />
               <button
                 onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
-                className="px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded"
+                className="px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground rounded"
               >
                 Bugün
               </button>
             </div>
             <button
               onClick={() => window.open(`/print/gunluk-kasa?date=${selectedDate}`, '_blank')}
-              className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+              className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors">
               <Printer className="h-4 w-4" />
               Yazdır
             </button>
@@ -245,15 +245,15 @@ function GunlukKasaContent() {
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
 
           {/* Left Column: Tahsilatlar */}
-          <div className="flex flex-col rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden h-full">
-            <div className="bg-green-50 p-4 border-b border-green-100 flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-green-600" />
-              <h3 className="font-bold text-green-700">Günlük Müşteri Tahsilatları</h3>
+          <div className="flex flex-col rounded-xl border border-border bg-card shadow-sm overflow-hidden h-full">
+            <div className="bg-green-100/50 dark:bg-green-900/20 p-4 border-b border-green-200/50 dark:border-green-800/30 flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-green-700 dark:text-green-400" />
+              <h3 className="font-bold text-green-800 dark:text-green-300">Günlük Müşteri Tahsilatları</h3>
             </div>
 
             <div className="flex-1 overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-slate-50 text-slate-500 border-b border-slate-200">
+                <thead className="bg-muted/50 text-muted-foreground border-b border-border">
                   <tr>
                     <th className="px-3 py-3 font-medium w-12 text-center">SIRA NO</th>
                     <th className="px-3 py-3 font-medium">MÜŞTERİ İSMİ</th>
@@ -262,7 +262,7 @@ function GunlukKasaContent() {
                     <th className="px-3 py-3 font-medium text-center w-24">İŞLEM</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-border">
                   {/* Existing Collections */}
                   {collections.map((item, index) => (
                     <CollectionRow
@@ -296,29 +296,29 @@ function GunlukKasaContent() {
               </table>
             </div>
 
-            {/* Footer Summary - Left - RESTORED */}
-            <div className="bg-slate-50 p-6 border-t border-slate-200 space-y-3">
+            {/* Footer Summary - Left */}
+            <div className="bg-muted/30 p-6 border-t border-border space-y-3">
               <div className="flex justify-between items-center text-sm">
-                <span className="font-bold text-slate-700">BUGÜN TAHSİLAT TOPLAMI</span>
-                <span className="font-bold text-green-600">
+                <span className="font-bold text-muted-foreground">BUGÜN TAHSİLAT TOPLAMI</span>
+                <span className="font-bold text-green-600 dark:text-green-400">
                   ₺{totalCollection.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
                 </span>
               </div>
               <div className="flex justify-between items-center text-sm">
-                <span className="font-bold text-slate-700">BUGÜN ÖDENEN YÖMİYELER TOPLAMI</span>
-                <span className="font-bold text-slate-900">₺{todayPaidWages.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</span>
+                <span className="font-bold text-muted-foreground">BUGÜN ÖDENEN YÖMİYELER TOPLAMI</span>
+                <span className="font-bold text-foreground">₺{todayPaidWages.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
-                <span className="font-bold text-slate-700">TOPLAM YEVMİYE BORCU</span>
-                <span className="font-bold text-red-600">₺{totalWageDebt.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</span>
+                <span className="font-bold text-muted-foreground">TOPLAM YEVMİYE BORCU</span>
+                <span className="font-bold text-red-600 dark:text-red-400">₺{totalWageDebt.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
-                <span className="font-bold text-slate-700">DÜNDEN KASA DEVRİ</span>
-                <span className="font-bold text-slate-900">₺{previousBalance.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</span>
+                <span className="font-bold text-muted-foreground">DÜNDEN KASA DEVRİ</span>
+                <span className="font-bold text-foreground">₺{previousBalance.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</span>
               </div>
-              <div className="pt-3 border-t border-slate-200 flex justify-between items-center">
-                <span className="font-black text-slate-800 text-lg">BUGÜN KASA TOPLAMI</span>
-                <span className="font-black text-blue-600 text-lg">
+              <div className="pt-3 border-t border-border flex justify-between items-center">
+                <span className="font-black text-foreground text-lg">BUGÜN KASA TOPLAMI</span>
+                <span className="font-black text-blue-600 dark:text-blue-400 text-lg">
                   ₺{(previousBalance + totalCollection - totalExpense - todayPaidWages).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
                 </span>
               </div>
@@ -326,15 +326,15 @@ function GunlukKasaContent() {
           </div>
 
           {/* Right Column: Harcamalar */}
-          <div className="flex flex-col rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden h-full">
-            <div className="bg-red-50 p-4 border-b border-red-100 flex items-center gap-2">
-              <TrendingDown className="h-5 w-5 text-red-600" />
-              <h3 className="font-bold text-red-700">Günlük Genel Harcamalar</h3>
+          <div className="flex flex-col rounded-xl border border-border bg-card shadow-sm overflow-hidden h-full">
+            <div className="bg-red-100/50 dark:bg-red-900/20 p-4 border-b border-red-200/50 dark:border-red-800/30 flex items-center gap-2">
+              <TrendingDown className="h-5 w-5 text-red-700 dark:text-red-400" />
+              <h3 className="font-bold text-red-800 dark:text-red-300">Günlük Genel Harcamalar</h3>
             </div>
 
             <div className="flex-1 overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-slate-50 text-slate-500 border-b border-slate-200">
+                <thead className="bg-muted/50 text-muted-foreground border-b border-border">
                   <tr>
                     <th className="px-3 py-3 font-medium w-12 text-center">SIRA NO</th>
                     <th className="px-3 py-3 font-medium">HARCAMA DETAYI</th>
@@ -344,7 +344,7 @@ function GunlukKasaContent() {
                     <th className="px-3 py-3 font-medium text-center w-24">İŞLEM</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-border">
                   {/* Existing Expenses */}
                   {expenses.map((item, index) => (
                     <ExpenseRow
@@ -369,21 +369,21 @@ function GunlukKasaContent() {
               </table>
             </div>
 
-            {/* Footer Summary - Right - RESTORED */}
-            <div className="bg-slate-50 p-6 border-t border-slate-200 space-y-3">
+            {/* Footer Summary - Right */}
+            <div className="bg-muted/30 p-6 border-t border-border space-y-3">
               <div className="flex justify-between items-center text-sm">
-                <span className="font-bold text-slate-700">BUGÜN ÖDENEN GİDERLER TOPLAMI</span>
-                <span className="font-bold text-red-600">
+                <span className="font-bold text-muted-foreground">BUGÜN ÖDENEN GİDERLER TOPLAMI</span>
+                <span className="font-bold text-red-600 dark:text-red-400">
                   ₺{totalExpense.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
                 </span>
               </div>
               <div className="flex justify-between items-center text-sm">
-                <span className="font-bold text-slate-700">BUGÜN İTİBARİYLE TOPLAM YEVMİYE BORCU</span>
-                <span className="font-bold text-slate-900">₺0,00</span>
+                <span className="font-bold text-muted-foreground">BUGÜN İTİBARİYLE TOPLAM YEVMİYE BORCU</span>
+                <span className="font-bold text-foreground">₺0,00</span>
               </div>
               <div className="flex justify-between items-center text-sm">
-                <span className="font-bold text-slate-700">BUGÜN ÖDENEN YÖMİYE TOPLAMI</span>
-                <span className="font-bold text-slate-900">₺0,00</span>
+                <span className="font-bold text-muted-foreground">BUGÜN ÖDENEN YÖMİYE TOPLAMI</span>
+                <span className="font-bold text-foreground">₺0,00</span>
               </div>
             </div>
           </div>
@@ -412,9 +412,9 @@ function CollectionRow({ index, item, isNew, defaultDate, onSave, onDelete, init
   // New logic: For existing items, it's just display usually, but let's keep it 'input' style to match UI.
 
   return (
-    <tr className="hover:bg-slate-50/50">
-      <td className="px-3 py-2 text-center text-slate-500 font-medium">{index + 1}</td>
-      <td className="px-3 py-2 text-slate-900 font-bold">
+    <tr className="hover:bg-muted/50 transition-colors">
+      <td className="px-3 py-2 text-center text-muted-foreground font-medium">{index + 1}</td>
+      <td className="px-3 py-2 text-foreground font-bold">
         {isNew ? (
           <CustomerSelect
             onSelect={setCustomer}
@@ -425,7 +425,7 @@ function CollectionRow({ index, item, isNew, defaultDate, onSave, onDelete, init
         )}
       </td>
       <td className="px-3 py-2">
-        <div className="w-full rounded border border-slate-200 py-1.5 px-2 text-center text-xs bg-slate-50 text-slate-500 font-medium">
+        <div className="w-full rounded border border-border py-1.5 px-2 text-center text-xs bg-muted/30 text-muted-foreground font-medium">
           {new Date(item?.date || defaultDate).toLocaleDateString("tr-TR")}
         </div>
       </td>
@@ -435,11 +435,11 @@ function CollectionRow({ index, item, isNew, defaultDate, onSave, onDelete, init
             type="number"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-full rounded-l border border-r-0 border-slate-200 py-1.5 px-2 text-right text-xs outline-none focus:border-green-500 font-bold"
+            className="w-full rounded-l border border-r-0 border-input bg-background py-1.5 px-2 text-right text-xs outline-none focus:border-green-500 font-bold text-foreground"
             placeholder="0"
           />
-          <div className="border border-l-0 border-slate-200 bg-slate-50 px-2 py-1.5 rounded-r">
-            <span className="text-xs text-slate-500">₺</span>
+          <div className="border border-l-0 border-input bg-muted px-2 py-1.5 rounded-r">
+            <span className="text-xs text-muted-foreground">₺</span>
           </div>
         </div>
       </td>
@@ -447,13 +447,13 @@ function CollectionRow({ index, item, isNew, defaultDate, onSave, onDelete, init
         <div className="flex items-center justify-center gap-1">
           <button
             onClick={() => onSave({ customer, amount })}
-            className="rounded bg-green-500 p-1.5 text-white hover:bg-green-600 transition-colors shadow-sm shadow-green-200">
+            className="rounded bg-green-500 p-1.5 text-white hover:bg-green-600 transition-colors shadow-sm shadow-green-200 dark:shadow-none">
             <Save className="h-3 w-3" />
           </button>
           {!isNew && (
             <button
               onClick={onDelete}
-              className="rounded bg-red-100 p-1.5 text-red-600 hover:bg-red-200 transition-colors">
+              className="rounded bg-destructive/10 p-1.5 text-destructive hover:bg-destructive/20 transition-colors">
               <Trash2 className="h-3 w-3" />
             </button>
           )}
@@ -470,15 +470,15 @@ function ExpenseRow({ index, item, isNew, onSave, onDelete }: any) {
   const [method, setMethod] = useState(item?.method || 'Nakit');
 
   return (
-    <tr className="hover:bg-slate-50/50">
-      <td className="px-3 py-2 text-center text-slate-500 font-medium">{index + 1}</td>
+    <tr className="hover:bg-muted/50 transition-colors">
+      <td className="px-3 py-2 text-center text-muted-foreground font-medium">{index + 1}</td>
       <td className="px-3 py-2">
         <input
           type="text"
           value={detail}
           onChange={(e) => setDetail(e.target.value)}
           placeholder={isNew ? "Harcama..." : ""}
-          className="w-full rounded border border-slate-200 py-1.5 px-2 text-xs outline-none focus:border-red-500"
+          className="w-full rounded border border-input bg-background py-1.5 px-2 text-xs outline-none focus:border-red-500 text-foreground placeholder:text-muted-foreground"
         />
       </td>
       <td className="px-3 py-2">
@@ -487,7 +487,7 @@ function ExpenseRow({ index, item, isNew, onSave, onDelete }: any) {
           value={receiptNo}
           onChange={(e) => setReceiptNo(e.target.value)}
           placeholder={isNew ? "Fiş No..." : ""}
-          className="w-full rounded border border-slate-200 py-1.5 px-2 text-xs outline-none focus:border-red-500"
+          className="w-full rounded border border-input bg-background py-1.5 px-2 text-xs outline-none focus:border-red-500 text-foreground placeholder:text-muted-foreground"
         />
       </td>
       <td className="px-3 py-2">
@@ -496,11 +496,11 @@ function ExpenseRow({ index, item, isNew, onSave, onDelete }: any) {
             type="number"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-full rounded-l border border-r-0 border-slate-200 py-1.5 px-2 text-right text-xs outline-none focus:border-red-500 font-bold"
+            className="w-full rounded-l border border-r-0 border-input bg-background py-1.5 px-2 text-right text-xs outline-none focus:border-red-500 font-bold text-foreground placeholder:text-muted-foreground"
             placeholder="0"
           />
-          <div className="border border-l-0 border-slate-200 bg-slate-50 px-2 py-1.5 rounded-r">
-            <span className="text-xs text-slate-500">₺</span>
+          <div className="border border-l-0 border-input bg-muted px-2 py-1.5 rounded-r">
+            <span className="text-xs text-muted-foreground">₺</span>
           </div>
         </div>
       </td>
@@ -508,7 +508,7 @@ function ExpenseRow({ index, item, isNew, onSave, onDelete }: any) {
         <select
           value={method}
           onChange={(e) => setMethod(e.target.value)}
-          className="w-full rounded border border-slate-200 py-1.5 px-1 text-xs outline-none focus:border-red-500 bg-white">
+          className="w-full rounded border border-input bg-background py-1.5 px-1 text-xs outline-none focus:border-red-500 text-foreground">
           <option>Nakit</option>
           <option>Kredi Kartı</option>
           <option>Havale</option>
@@ -518,13 +518,13 @@ function ExpenseRow({ index, item, isNew, onSave, onDelete }: any) {
         <div className="flex items-center justify-center gap-1">
           <button
             onClick={() => onSave({ detail, receiptNo, amount, method })}
-            className="rounded bg-red-500 p-1.5 text-white hover:bg-red-600 transition-colors shadow-sm shadow-red-200">
+            className="rounded bg-red-500 p-1.5 text-white hover:bg-red-600 transition-colors shadow-sm shadow-red-200 dark:shadow-none">
             <Save className="h-3 w-3" />
           </button>
           {!isNew && (
             <button
               onClick={onDelete}
-              className="rounded bg-red-100 p-1.5 text-red-600 hover:bg-red-200 transition-colors">
+              className="rounded bg-destructive/10 p-1.5 text-destructive hover:bg-destructive/20 transition-colors">
               <Trash2 className="h-3 w-3" />
             </button>
           )}

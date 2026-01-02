@@ -96,15 +96,15 @@ export default function MusterilerPage() {
         {/* Page Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-bold text-slate-800">Müşteriler</h2>
-            <div className="flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
+            <h2 className="text-2xl font-bold text-foreground">Müşteriler</h2>
+            <div className="flex items-center gap-2 rounded-lg bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
               <Users className="h-4 w-4" />
               Toplam: <span className="font-bold">{totalCount}</span>
             </div>
           </div>
           <button
             onClick={handleAddNew}
-            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700 shadow-md shadow-blue-200"
+            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-primary-foreground transition-colors hover:bg-primary/90 shadow-md shadow-primary/20"
           >
             <Plus className="h-4 w-4" />
             Yeni Müşteri
@@ -112,24 +112,24 @@ export default function MusterilerPage() {
         </div>
 
         {/* Filters Bar */}
-        <div className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:flex-row md:items-center">
+        <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 shadow-sm md:flex-row md:items-center">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="İsim veya telefon ile ara..."
-              className="w-full rounded-lg border border-slate-200 py-2 pl-10 pr-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+              className="w-full rounded-lg border border-input bg-background py-2 pl-10 pr-4 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-foreground placeholder:text-muted-foreground"
             />
           </div>
 
-          <div className="flex items-center gap-2 border-l border-slate-100 pl-4">
-            <span className="flex items-center gap-1 text-sm font-medium text-slate-500">
+          <div className="flex items-center gap-2 border-l border-border pl-4">
+            <span className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
               <Filter className="h-4 w-4" />
               Tip:
             </span>
-            <div className="flex gap-1 rounded-lg bg-slate-100 p-1">
+            <div className="flex gap-1 rounded-lg bg-muted/50 p-1">
               {["Tümü", "Normal", "Düzenli", "Sıkıntılı"].map((filter) => (
                 <button
                   key={filter}
@@ -137,8 +137,8 @@ export default function MusterilerPage() {
                   className={cn(
                     "rounded px-3 py-1 text-sm font-medium transition-all",
                     activeFilter === filter
-                      ? "bg-blue-600 text-white shadow-sm"
-                      : "text-slate-600 hover:bg-slate-200"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
                   {filter}
@@ -149,10 +149,10 @@ export default function MusterilerPage() {
         </div>
 
         {/* Customer List Table */}
-        <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 text-slate-500 border-b border-slate-200">
+              <thead className="bg-muted/50 text-muted-foreground border-b border-border">
                 <tr>
                   <th className="px-6 py-4 font-medium">Müşteri Adı</th>
                   <th className="px-6 py-4 font-medium">Tip</th>
@@ -162,49 +162,49 @@ export default function MusterilerPage() {
                   <th className="px-6 py-4 text-center font-medium">İşlemler</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-border">
                 {loading ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
+                    <td colSpan={6} className="px-6 py-8 text-center text-muted-foreground">
                       Yükleniyor...
                     </td>
                   </tr>
                 ) : customers.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
+                    <td colSpan={6} className="px-6 py-8 text-center text-muted-foreground">
                       Müşteri bulunamadı.
                     </td>
                   </tr>
                 ) : (
                   customers.map((customer) => (
-                    <tr key={customer.id} className="group hover:bg-slate-50/50 transition-colors">
-                      <td className="px-6 py-4 font-bold text-slate-700">{customer.name}</td>
+                    <tr key={customer.id} className="group hover:bg-muted/50 transition-colors">
+                      <td className="px-6 py-4 font-bold text-foreground">{customer.name}</td>
                       <td className="px-6 py-4">
-                        <span className="inline-block rounded bg-blue-100 px-2 py-0.5 text-xs font-bold text-blue-700 border border-blue-200">
+                        <span className="inline-block rounded bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary border border-primary/20">
                           {customer.type}
                         </span>
                       </td>
-                      <td className="px-6 py-4 font-medium text-slate-900">{customer.phone}</td>
-                      <td className="px-6 py-4 text-slate-500 max-w-xs truncate" title={customer.address}>
+                      <td className="px-6 py-4 font-medium text-foreground">{customer.phone}</td>
+                      <td className="px-6 py-4 text-muted-foreground max-w-xs truncate" title={customer.address}>
                         {customer.address}
                       </td>
-                      <td className="px-6 py-4 font-bold text-slate-700">
+                      <td className="px-6 py-4 font-bold text-foreground">
                         ₺{(customer.balance || 0).toFixed(2).replace('.', ',')}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-center gap-2">
-                          <Link href={`/musteriler/${customer.id}`} className="rounded p-1.5 text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-colors" title="Detay">
+                          <Link href={`/musteriler/${customer.id}`} className="rounded p-1.5 text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors" title="Detay">
                             <Eye className="h-4 w-4" />
                           </Link>
                           <button
                             onClick={() => handleEdit(customer)}
-                            className="rounded p-1.5 text-slate-400 hover:bg-amber-50 hover:text-amber-600 transition-colors"
+                            className="rounded p-1.5 text-muted-foreground hover:bg-orange-500/10 hover:text-orange-500 transition-colors"
                             title="Düzenle">
                             <Pencil className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(customer.id)}
-                            className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+                            className="rounded p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
                             title="Sil">
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -219,15 +219,15 @@ export default function MusterilerPage() {
 
           {/* Pagination Controls */}
           {totalCount > 0 && (
-            <div className="flex items-center justify-between border-t border-slate-100 px-6 py-4">
-              <div className="text-sm text-slate-500">
-                Toplam <span className="font-bold text-slate-800">{totalCount}</span> kayıttan <span className="font-bold text-slate-800">{(page - 1) * pageSize + 1}</span> - <span className="font-bold text-slate-800">{Math.min(page * pageSize, totalCount)}</span> arası gösteriliyor
+            <div className="flex items-center justify-between border-t border-border px-6 py-4">
+              <div className="text-sm text-muted-foreground">
+                Toplam <span className="font-bold text-foreground">{totalCount}</span> kayıttan <span className="font-bold text-foreground">{(page - 1) * pageSize + 1}</span> - <span className="font-bold text-foreground">{Math.min(page * pageSize, totalCount)}</span> arası gösteriliyor
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ChevronLeft className="h-4 w-4" />
                   Önceki
@@ -249,8 +249,8 @@ export default function MusterilerPage() {
                         className={cn(
                           "h-8 w-8 rounded-lg text-sm font-medium transition-colors",
                           page === pNum
-                            ? "bg-blue-600 text-white"
-                            : "hover:bg-slate-50 text-slate-600"
+                            ? "bg-primary text-primary-foreground"
+                            : "hover:bg-muted text-muted-foreground"
                         )}
                       >
                         {pNum}
@@ -261,7 +261,7 @@ export default function MusterilerPage() {
                 <button
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Sonraki
                   <ChevronRight className="h-4 w-4" />

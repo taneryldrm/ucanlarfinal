@@ -221,17 +221,18 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
         : [];
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
-            <div className="w-full max-w-3xl rounded-xl bg-white shadow-2xl animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
+
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+            <div className="w-full max-w-3xl rounded-xl bg-card border border-border shadow-2xl animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
 
                 {/* Modal Header */}
-                <div className="flex items-center justify-between border-b border-slate-100 p-6 shrink-0">
-                    <h2 className="text-xl font-bold text-slate-900">
+                <div className="flex items-center justify-between border-b border-border p-6 shrink-0">
+                    <h2 className="text-xl font-bold text-card-foreground">
                         {initialData ? "İş Emri Düzenle" : "Yeni İş Emri Oluştur"}
                     </h2>
                     <button
                         onClick={onClose}
-                        className="rounded-lg p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors"
+                        className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                     >
                         <X className="h-5 w-5" />
                     </button>
@@ -243,12 +244,12 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                     {/* Müşteri Seçimi */}
                     <div className="space-y-2 relative">
                         <div className="flex items-center justify-between">
-                            <label className="text-sm font-bold text-slate-900">
+                            <label className="text-sm font-bold text-foreground">
                                 Müşteri <span className="text-red-500">*</span>
                             </label>
                             <button
                                 onClick={() => setIsNewCustomerModalOpen(true)}
-                                className="flex items-center gap-1 rounded border border-slate-200 px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                                className="flex items-center gap-1 rounded border border-border px-2 py-1 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
                             >
                                 <Plus className="h-3 w-3" />
                                 Yeni Müşteri Oluştur
@@ -264,7 +265,7 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                         />
 
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                             <input
                                 type="text"
                                 value={customerSearch}
@@ -275,26 +276,26 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                                     }
                                 }}
                                 placeholder="Müşteri ara (isim veya telefon)..."
-                                className="w-full rounded-lg border border-slate-200 py-2.5 pl-10 pr-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                                className="w-full rounded-lg border border-input bg-background py-2.5 pl-10 pr-4 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-foreground placeholder:text-muted-foreground"
                             />
                             {isSearchingCustomer && (
                                 <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                    <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                                 </div>
                             )}
                         </div>
 
                         {/* Search Results Dropdown */}
                         {showCustomerResults && foundCustomers.length > 0 && (
-                            <div className="absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                            <div className="absolute z-10 w-full mt-1 bg-popover border border-border rounded-lg shadow-lg max-h-60 overflow-y-auto">
                                 {foundCustomers.map(customer => (
                                     <button
                                         key={customer.id}
                                         onClick={() => handleSelectCustomer(customer)}
-                                        className="w-full text-left px-4 py-3 hover:bg-slate-50 border-b border-slate-50 last:border-0"
+                                        className="w-full text-left px-4 py-3 hover:bg-muted/50 border-b border-border last:border-0"
                                     >
-                                        <div className="font-bold text-slate-900 text-sm">{customer.name}</div>
-                                        <div className="text-xs text-slate-500">
+                                        <div className="font-bold text-popover-foreground text-sm">{customer.name}</div>
+                                        <div className="text-xs text-muted-foreground">
                                             {customer.phone} - {
                                                 (() => {
                                                     const addr = Array.isArray(customer.address) ? customer.address[0] : customer.address;
@@ -310,7 +311,7 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                             </div>
                         )}
                         {showCustomerResults && foundCustomers.length === 0 && customerSearch.length > 2 && !isSearchingCustomer && (
-                            <div className="absolute z-10 w-full mt-1 bg-white p-4 text-sm text-slate-500 text-center border border-slate-200 rounded-lg shadow-lg">
+                            <div className="absolute z-10 w-full mt-1 bg-popover p-4 text-sm text-muted-foreground text-center border border-border rounded-lg shadow-lg">
                                 Sonuç bulunamadı.
                             </div>
                         )}
@@ -319,18 +320,18 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                     {/* Tarih ve Personel Sayısı */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-bold text-slate-900">
+                            <label className="text-sm font-bold text-foreground">
                                 İş Tarihi <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="date"
                                 value={date}
                                 onChange={(e) => setDate(e.target.value)}
-                                className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                                className="w-full rounded-lg border border-input bg-background px-4 py-2.5 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-foreground"
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-bold text-slate-900">
+                            <label className="text-sm font-bold text-foreground">
                                 Personel Sayısı <span className="text-red-500">*</span>
                             </label>
                             <input
@@ -338,42 +339,42 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                                 value={staffCount}
                                 onChange={(e) => setStaffCount(Number(e.target.value))}
                                 min={1}
-                                className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                                className="w-full rounded-lg border border-input bg-background px-4 py-2.5 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-foreground"
                             />
                         </div>
                     </div>
 
                     {/* Personel Seçimi */}
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-slate-900">
-                            Personel Seçimi <span className="text-xs font-normal text-slate-500">(Opsiyonel)</span>
+                        <label className="text-sm font-bold text-foreground">
+                            Personel Seçimi <span className="text-xs font-normal text-muted-foreground">(Opsiyonel)</span>
                         </label>
-                        <div className="rounded-lg border border-slate-200 p-4 space-y-3">
+                        <div className="rounded-lg border border-input p-4 space-y-3">
                             <div className="relative mb-3">
-                                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                 <input
                                     type="text"
                                     value={staffSearch}
                                     onChange={(e) => setStaffSearch(e.target.value)}
                                     placeholder="Listede ara..."
-                                    className="w-full rounded-lg border border-slate-200 py-2 pl-10 pr-4 text-sm outline-none focus:border-blue-500"
+                                    className="w-full rounded-lg border border-input bg-background py-2 pl-10 pr-4 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-foreground placeholder:text-muted-foreground"
                                 />
                             </div>
                             <div className="space-y-2 max-h-40 overflow-y-auto pr-2">
                                 {foundStaff
                                     .filter(s => s.full_name?.toLowerCase().includes(staffSearch.toLowerCase()) || s.name?.toLowerCase().includes(staffSearch.toLowerCase()))
                                     .map((staff) => (
-                                        <label key={staff.id} className="flex items-center gap-3 p-2 rounded hover:bg-slate-50 cursor-pointer">
+                                        <label key={staff.id} className="flex items-center gap-3 p-2 rounded hover:bg-muted/50 cursor-pointer">
                                             <input
                                                 type="checkbox"
                                                 checked={selectedStaffIds.includes(staff.id)}
                                                 onChange={() => toggleStaff(staff.id)}
-                                                className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                                className="h-4 w-4 rounded border-input text-primary focus:ring-ring"
                                             />
-                                            <span className="text-sm font-medium text-slate-700">{staff.full_name || staff.name}</span>
+                                            <span className="text-sm font-medium text-foreground">{staff.full_name || staff.name}</span>
                                         </label>
                                     ))}
-                                {foundStaff.length === 0 && <div className="text-xs text-slate-400 text-center py-2">Personel bulunamadı</div>}
+                                {foundStaff.length === 0 && <div className="text-xs text-muted-foreground text-center py-2">Personel bulunamadı</div>}
                             </div>
                         </div>
                     </div>
@@ -381,21 +382,21 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                     {/* Açıklama ve Adres */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-bold text-slate-900">Açıklama</label>
+                            <label className="text-sm font-bold text-foreground">Açıklama</label>
                             <input
                                 type="text"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                                 placeholder="İş açıklaması..."
-                                className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                                className="w-full rounded-lg border border-input bg-background px-4 py-2.5 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-foreground placeholder:text-muted-foreground"
                             />
                         </div>
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                                <label className="text-sm font-bold text-slate-900">Adres</label>
+                                <label className="text-sm font-bold text-foreground">Adres</label>
                                 {availableAddresses.length > 1 && (
                                     <select
-                                        className="text-xs border border-slate-200 rounded px-2 py-1 outline-none focus:border-blue-500 max-w-[150px] truncate"
+                                        className="text-xs border border-input bg-background rounded px-2 py-1 outline-none focus:border-ring max-w-[150px] truncate"
                                         onChange={(e) => setAddress(e.target.value)}
                                         value={""} // Always show placeholder behavior, or manage state properly? 
                                     // Better: "Adres Seç" option as first
@@ -412,14 +413,14 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                                 value={address}
                                 onChange={(e) => setAddress(e.target.value)}
                                 placeholder="İş adresi..."
-                                className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                                className="w-full rounded-lg border border-input bg-background px-4 py-2.5 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-blue-500/10 text-foreground placeholder:text-muted-foreground"
                             />
                         </div>
                     </div>
 
                     {/* Tutar */}
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-slate-900">
+                        <label className="text-sm font-bold text-foreground">
                             Tutar (₺) <span className="text-red-500">*</span>
                         </label>
                         <input
@@ -427,31 +428,31 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
                             placeholder="0.00"
-                            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            className="w-full rounded-lg border border-input bg-background px-4 py-2.5 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-foreground placeholder:text-muted-foreground"
                         />
                     </div>
 
                     {/* Tekrarlayan İş Emri */}
-                    <div className="space-y-4 pt-2 border-t border-slate-100">
+                    <div className="space-y-4 pt-2 border-t border-border">
                         <label className="flex items-center gap-2 cursor-pointer">
                             <input
                                 type="checkbox"
                                 checked={isRecurring}
                                 onChange={(e) => setIsRecurring(e.target.checked)}
-                                className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                className="h-4 w-4 rounded border-input text-primary focus:ring-ring"
                             />
-                            <span className="text-sm font-bold text-slate-900">Tekrarlayan İş Emri</span>
+                            <span className="text-sm font-bold text-foreground">Tekrarlayan İş Emri</span>
                         </label>
 
                         {isRecurring && (
                             <div className="space-y-4 pl-6 animate-in slide-in-from-top-2 duration-200">
                                 {/* Sıklık Seçimi */}
                                 <div className="space-y-2">
-                                    <label className="text-sm font-bold text-slate-900">Sıklık</label>
+                                    <label className="text-sm font-bold text-foreground">Sıklık</label>
                                     <select
                                         value={frequency}
                                         onChange={(e) => setFrequency(e.target.value)}
-                                        className="w-full appearance-none rounded-lg border border-slate-200 bg-slate-800 text-white px-4 py-2.5 text-sm outline-none focus:border-blue-500"
+                                        className="w-full appearance-none rounded-lg border border-input bg-background px-4 py-2.5 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-foreground"
                                     >
                                         <option value="once_week">Haftada 1</option>
                                         <option value="twice_week">Haftada 2</option>
@@ -461,19 +462,19 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
 
                                 {/* Bitiş Tarihi */}
                                 <div className="space-y-2">
-                                    <label className="text-sm font-bold text-slate-900">Bitiş Tarihi</label>
+                                    <label className="text-sm font-bold text-foreground">Bitiş Tarihi</label>
                                     <input
                                         type="date"
                                         value={recurringEndDate}
                                         onChange={(e) => setRecurringEndDate(e.target.value)}
-                                        className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                                        className="w-full rounded-lg border border-input bg-background px-4 py-2.5 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-foreground"
                                     />
                                 </div>
 
                                 {/* Haftada 1 Seçimi */}
                                 {frequency === 'once_week' && (
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-slate-900">Gün Seçimi</label>
+                                        <label className="text-sm font-bold text-foreground">Gün Seçimi</label>
                                         <div className="flex flex-wrap gap-2">
                                             {["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"].map((day) => (
                                                 <button
@@ -482,8 +483,8 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                                                     className={cn(
                                                         "px-3 py-1.5 rounded text-sm font-medium border transition-colors",
                                                         selectedDays.includes(day)
-                                                            ? "bg-blue-600 text-white border-blue-600"
-                                                            : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                                                            ? "bg-primary text-primary-foreground border-primary"
+                                                            : "bg-background text-muted-foreground border-border hover:bg-muted"
                                                     )}
                                                 >
                                                     {day}
@@ -496,7 +497,7 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                                 {/* Haftada 2 Seçimi */}
                                 {frequency === 'twice_week' && (
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-slate-900">Gün Seçimi (En fazla 2)</label>
+                                        <label className="text-sm font-bold text-foreground">Gün Seçimi (En fazla 2)</label>
                                         <div className="flex flex-wrap gap-2">
                                             {["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"].map((day) => (
                                                 <button
@@ -505,8 +506,8 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                                                     className={cn(
                                                         "px-3 py-1.5 rounded text-sm font-medium border transition-colors",
                                                         selectedDays.includes(day)
-                                                            ? "bg-blue-600 text-white border-blue-600"
-                                                            : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                                                            ? "bg-primary text-primary-foreground border-primary"
+                                                            : "bg-background text-muted-foreground border-border hover:bg-muted"
                                                     )}
                                                 >
                                                     {day}
@@ -519,8 +520,8 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                                 {/* Ayda 1 Seçimi */}
                                 {frequency === 'once_month' && (
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-slate-900">Gün Seçimi</label>
-                                        <select className="w-full appearance-none rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-blue-500">
+                                        <label className="text-sm font-bold text-foreground">Gün Seçimi</label>
+                                        <select className="w-full appearance-none rounded-lg border border-input bg-background px-4 py-2.5 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-foreground">
                                             {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
                                                 <option key={day} value={day}>{day}. Gün</option>
                                             ))}
@@ -530,12 +531,12 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
 
                                 {/* Bitiş Tarihi */}
                                 <div className="space-y-2">
-                                    <label className="text-sm font-bold text-slate-900">
-                                        Bitiş Tarihi <span className="text-xs font-normal text-slate-500">(Opsiyonel)</span>
+                                    <label className="text-sm font-bold text-foreground">
+                                        Bitiş Tarihi <span className="text-xs font-normal text-muted-foreground">(Opsiyonel)</span>
                                     </label>
                                     <input
                                         type="date"
-                                        className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                                        className="w-full rounded-lg border border-input bg-background px-4 py-2.5 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-foreground"
                                     />
                                 </div>
                             </div>
@@ -545,16 +546,16 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                 </div>
 
                 {/* Modal Footer */}
-                <div className="flex justify-end gap-3 border-t border-slate-100 p-6 bg-slate-50 shrink-0 rounded-b-xl">
+                <div className="flex justify-end gap-3 border-t border-border p-6 bg-muted/40 shrink-0 rounded-b-xl">
                     <button
                         onClick={onClose}
-                        className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                        className="rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted"
                     >
                         İptal
                     </button>
                     <button
                         onClick={handleSave}
-                        className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700 shadow-md shadow-blue-200"
+                        className="rounded-lg bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20"
                     >
                         Kaydet
                     </button>

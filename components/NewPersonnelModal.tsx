@@ -62,17 +62,17 @@ export function NewPersonnelModal({ isOpen, onClose, initialData, onSuccess }: {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
-            <div className="w-full max-w-lg rounded-xl bg-white shadow-2xl animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+            <div className="w-full max-w-lg rounded-xl bg-card border border-border shadow-2xl animate-in fade-in zoom-in duration-200">
 
                 {/* Modal Header */}
-                <div className="flex items-center justify-between border-b border-slate-100 p-6">
-                    <h2 className="text-xl font-bold text-slate-900">
+                <div className="flex items-center justify-between border-b border-border p-6">
+                    <h2 className="text-xl font-bold text-card-foreground">
                         {initialData ? "Personel Düzenle" : "Yeni Personel Ekle"}
                     </h2>
                     <button
                         onClick={onClose}
-                        className="rounded-lg p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors"
+                        className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                     >
                         <X className="h-5 w-5" />
                     </button>
@@ -83,7 +83,7 @@ export function NewPersonnelModal({ isOpen, onClose, initialData, onSuccess }: {
 
                     {/* Ad Soyad */}
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-slate-900">
+                        <label className="text-sm font-bold text-foreground">
                             Ad Soyad <span className="text-red-500">*</span>
                         </label>
                         <input
@@ -91,41 +91,41 @@ export function NewPersonnelModal({ isOpen, onClose, initialData, onSuccess }: {
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder="Ad soyad girin..."
-                            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            className="w-full rounded-lg border border-input bg-background px-4 py-2.5 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-foreground placeholder:text-muted-foreground"
                         />
                     </div>
 
                     {/* Telefon */}
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-slate-900">Telefon</label>
+                        <label className="text-sm font-bold text-foreground">Telefon</label>
                         <input
                             type="text"
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
                             placeholder="Telefon numarası..."
-                            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            className="w-full rounded-lg border border-input bg-background px-4 py-2.5 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-foreground placeholder:text-muted-foreground"
                         />
                     </div>
 
                     {/* TC Kimlik No */}
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-slate-900">TC Kimlik No</label>
+                        <label className="text-sm font-bold text-foreground">TC Kimlik No</label>
                         <input
                             type="text"
                             value={tc}
                             onChange={(e) => setTc(e.target.value)}
                             placeholder="TC kimlik numarası..."
-                            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            className="w-full rounded-lg border border-input bg-background px-4 py-2.5 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-foreground placeholder:text-muted-foreground"
                         />
                     </div>
 
                     {/* Durum */}
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-slate-900">Durum</label>
+                        <label className="text-sm font-bold text-foreground">Durum</label>
                         <select
                             value={status}
                             onChange={(e) => setStatus(e.target.value)}
-                            className="w-full appearance-none rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            className="w-full appearance-none rounded-lg border border-input bg-background px-4 py-2.5 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-foreground"
                         >
                             <option value="Aktif">Aktif</option>
                             <option value="Pasif">Pasif</option>
@@ -135,20 +135,20 @@ export function NewPersonnelModal({ isOpen, onClose, initialData, onSuccess }: {
                 </div>
 
                 {/* Modal Footer */}
-                <div className="flex justify-end gap-3 border-t border-slate-100 p-6 rounded-b-xl">
+                <div className="flex justify-end gap-3 border-t border-border p-6 rounded-b-xl bg-muted/40">
                     <button
                         onClick={onClose}
                         disabled={loading}
-                        className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                        className="rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted disabled:opacity-50"
                     >
                         İptal
                     </button>
                     <button
                         onClick={handleSave}
                         disabled={loading}
-                        className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700 shadow-md shadow-blue-200 disabled:opacity-50 flex items-center gap-2"
+                        className="rounded-lg bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20 disabled:opacity-50 flex items-center gap-2"
                     >
-                        {loading && <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
+                        {loading && <div className="h-4 w-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div>}
                         Kaydet
                     </button>
                 </div>

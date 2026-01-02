@@ -48,30 +48,30 @@ export default function GecmisAramaPage() {
       <Header title="Geçmiş Arama" />
       <div className="p-8 space-y-6">
 
-        <h2 className="text-2xl font-bold text-slate-800">Geçmiş Arama</h2>
+        <h2 className="text-2xl font-bold text-foreground">Geçmiş Arama</h2>
 
         {/* Search Criteria Box */}
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
-          <h3 className="font-bold text-slate-800 text-sm">Arama Kriterleri</h3>
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-4">
+          <h3 className="font-bold text-foreground text-sm">Arama Kriterleri</h3>
 
           <div className="flex flex-col gap-4 md:flex-row md:items-end">
             <div className="flex-1 space-y-1">
-              <label className="text-xs font-bold text-slate-700">Arama Terimi</label>
+              <label className="text-xs font-bold text-muted-foreground">Arama Terimi</label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="Müşteri adı, açıklama vb..."
-                  className="w-full rounded-lg border border-slate-300 py-2.5 pl-10 pr-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                  className="w-full rounded-lg border border-input bg-background py-2.5 pl-10 pr-4 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-foreground placeholder:text-muted-foreground"
                 />
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-700">Tarih Aralığı</label>
+              <label className="text-xs font-bold text-muted-foreground">Tarih Aralığı</label>
               <div className="flex items-center gap-2">
                 {!isAllTime && (
                   <>
@@ -79,26 +79,26 @@ export default function GecmisAramaPage() {
                       type="date"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
-                      className="rounded-lg border border-slate-300 py-2 px-3 text-sm outline-none focus:border-blue-500"
+                      className="rounded-lg border border-input bg-background py-2 px-3 text-sm outline-none focus:border-ring text-foreground"
                     />
-                    <span className="text-slate-400">-</span>
+                    <span className="text-muted-foreground">-</span>
                     <input
                       type="date"
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
-                      className="rounded-lg border border-slate-300 py-2 px-3 text-sm outline-none focus:border-blue-500"
+                      className="rounded-lg border border-input bg-background py-2 px-3 text-sm outline-none focus:border-ring text-foreground"
                     />
                   </>
                 )}
 
-                <div className="flex items-center gap-2 pl-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                <div className="flex items-center gap-2 pl-2 bg-muted/50 border border-border rounded-lg px-3 py-2">
                   <input
                     type="checkbox"
                     checked={isAllTime}
                     onChange={(e) => setIsAllTime(e.target.checked)}
-                    className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    className="h-4 w-4 rounded border-input text-primary focus:ring-ring"
                   />
-                  <span className="text-sm font-medium text-slate-700 whitespace-nowrap">Tüm Zamanlar</span>
+                  <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Tüm Zamanlar</span>
                 </div>
               </div>
             </div>
@@ -106,7 +106,7 @@ export default function GecmisAramaPage() {
             <button
               onClick={handleSearch}
               disabled={loading}
-              className="flex items-center gap-2 rounded-lg bg-blue-600 px-8 py-2.5 font-bold text-white transition-colors hover:bg-blue-700 shadow-md shadow-blue-200 disabled:opacity-50"
+              className="flex items-center gap-2 rounded-lg bg-primary px-8 py-2.5 font-bold text-primary-foreground transition-colors hover:bg-primary/90 shadow-md shadow-primary/20 dark:shadow-none disabled:opacity-50"
             >
               {loading ? (
                 <span className="animate-spin">⌛</span>
@@ -119,14 +119,14 @@ export default function GecmisAramaPage() {
         </div>
 
         {/* Results Box */}
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm min-h-[400px]">
-          <h3 className="font-bold text-slate-800 mb-6">
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm min-h-[400px]">
+          <h3 className="font-bold text-foreground mb-6">
             Sonuçlar {hasSearched && `(${searchResults.length})`}
           </h3>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-white text-slate-500 border-b border-slate-100">
+              <thead className="bg-card text-muted-foreground border-b border-border">
                 <tr>
                   <th className="px-4 py-3 font-medium">Kaynak</th>
                   <th className="px-4 py-3 font-medium">Ad/İsim</th>
@@ -136,32 +136,32 @@ export default function GecmisAramaPage() {
                   <th className="px-4 py-3 font-medium">Ek Bilgi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
+              <tbody className="divide-y divide-border">
                 {!hasSearched ? (
                   <tr>
-                    <td colSpan={6} className="px-4 py-12 text-center text-slate-500">
+                    <td colSpan={6} className="px-4 py-12 text-center text-muted-foreground">
                       Arama yapmak için yukarıdaki formu kullanın.
                     </td>
                   </tr>
                 ) : searchResults.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-4 py-12 text-center text-slate-500">
+                    <td colSpan={6} className="px-4 py-12 text-center text-muted-foreground">
                       Kriterlere uygun kayıt bulunamadı.
                     </td>
                   </tr>
                 ) : (
                   searchResults.map((result) => (
-                    <tr key={result.id} className="hover:bg-slate-50/50">
+                    <tr key={result.id} className="hover:bg-muted/50 transition-colors">
                       <td className="px-4 py-4">
-                        <span className="inline-block rounded px-2 py-1 bg-blue-600 text-white text-[10px] font-bold uppercase tracking-wider">
+                        <span className="inline-block rounded px-2 py-1 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wider shadow-sm">
                           {result.source}
                         </span>
                       </td>
-                      <td className="px-4 py-4 font-bold text-slate-800 uppercase">{result.name}</td>
-                      <td className="px-4 py-4 text-slate-700 text-xs max-w-md">{result.description}</td>
-                      <td className="px-4 py-4 font-medium text-slate-900">{result.date}</td>
-                      <td className="px-4 py-4 text-slate-500 text-center">{result.amount}</td>
-                      <td className="px-4 py-4 text-slate-500 text-xs whitespace-pre-line">
+                      <td className="px-4 py-4 font-bold text-foreground uppercase">{result.name}</td>
+                      <td className="px-4 py-4 text-foreground text-xs max-w-md">{result.description}</td>
+                      <td className="px-4 py-4 font-medium text-foreground">{result.date}</td>
+                      <td className="px-4 py-4 text-muted-foreground text-center">{result.amount}</td>
+                      <td className="px-4 py-4 text-muted-foreground text-xs whitespace-pre-line">
                         {result.extraInfo.split("|").map((line: string, i: number) => (
                           <div key={i}>{line.trim()}</div>
                         ))}

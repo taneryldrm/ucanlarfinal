@@ -89,26 +89,26 @@ function IsEmirleriContent() {
 
         {/* Page Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-slate-800">İş Emirleri</h2>
+          <h2 className="text-2xl font-bold text-foreground">İş Emirleri</h2>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 bg-white rounded-lg border border-slate-200 p-1">
-              <span className="text-xs font-semibold text-slate-500 px-2">Tarih:</span>
+            <div className="flex items-center gap-2 bg-card rounded-lg border border-border p-1">
+              <span className="text-xs font-semibold text-muted-foreground px-2">Tarih:</span>
               <input
                 type="date"
                 value={selectedDate}
                 onChange={(e) => { setSelectedDate(e.target.value); setPage(1); }}
-                className="px-2 py-1.5 text-sm font-bold text-slate-700 bg-slate-50 rounded border border-slate-200 hover:bg-slate-100 outline-none"
+                className="px-2 py-1.5 text-sm font-bold text-foreground bg-muted/50 rounded border border-border hover:bg-muted outline-none"
               />
               <button
                 onClick={() => { setSelectedDate(new Date().toISOString().split('T')[0]); setPage(1); }}
-                className="px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded"
+                className="px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground rounded"
               >
                 Bugün
               </button>
             </div>
             <button
               onClick={handleAddNew}
-              className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700 shadow-md shadow-blue-200"
+              className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-primary-foreground transition-colors hover:bg-primary/90 shadow-md shadow-primary/20"
             >
               <Plus className="h-4 w-4" />
               Yeni İş Emri
@@ -117,12 +117,12 @@ function IsEmirleriContent() {
         </div>
 
         {/* Jobs List */}
-        <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-6 min-h-[500px]">
-          <h3 className="text-sm font-bold text-slate-900 mb-4">Mevcut İş Emirleri</h3>
+        <div className="rounded-xl border border-border bg-card shadow-sm p-6 min-h-[500px]">
+          <h3 className="text-sm font-bold text-foreground mb-4">Mevcut İş Emirleri</h3>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-white text-slate-500 border-b border-slate-100">
+              <thead className="bg-muted/50 text-muted-foreground border-b border-border">
                 <tr>
                   <th className="px-4 py-3 font-medium">Müşteri</th>
                   <th className="px-4 py-3 font-medium">Tarih</th>
@@ -133,38 +133,38 @@ function IsEmirleriContent() {
                   <th className="px-4 py-3 text-right font-medium">İşlemler</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
+              <tbody className="divide-y divide-border">
                 {loading ? (
-                  <tr><td colSpan={7} className="p-8 text-center text-slate-500">Yükleniyor...</td></tr>
+                  <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">Yükleniyor...</td></tr>
                 ) : jobs.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
+                    <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
                       Seçilen tarihte iş emri bulunamadı.
                     </td>
                   </tr>
                 ) : (
                   jobs.map((job) => (
-                    <tr key={job.id} className="hover:bg-slate-50/50">
-                      <td className="px-4 py-4 font-bold text-slate-900">{job.customer}</td>
-                      <td className="px-4 py-4 text-slate-800 font-medium">
+                    <tr key={job.id} className="hover:bg-muted/50 transition-colors">
+                      <td className="px-4 py-4 font-bold text-foreground">{job.customer}</td>
+                      <td className="px-4 py-4 text-foreground font-medium">
                         {new Date(job.date).toLocaleDateString("tr-TR")}
                       </td>
-                      <td className="px-4 py-4 text-slate-800">{job.description}</td>
+                      <td className="px-4 py-4 text-foreground">{job.description}</td>
                       <td className="px-4 py-4">
-                        <span className="inline-flex items-center px-2.5 py-1 rounded bg-slate-100 text-xs font-bold text-slate-600">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded bg-muted/50 text-xs font-bold text-muted-foreground">
                           {/* Handle personnel generic or specialized display */}
                           {Array.isArray(job.personnel) ? job.personnel.join(", ") : (job.personnel || 'Belirsiz')}
                         </span>
                       </td>
-                      <td className="px-4 py-4 font-bold text-slate-900">
+                      <td className="px-4 py-4 font-bold text-foreground">
                         ₺{(job.amount || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
                       </td>
                       <td className="px-4 py-4">
-                        <span className={`inline-block px-3 py-1 text-xs font-bold rounded ${job.status === 'pending' ? 'bg-orange-100 text-orange-700' :
-                          job.status === 'approved' ? 'bg-blue-100 text-blue-700' :
-                            job.status === 'completed' ? 'bg-green-100 text-green-700' :
-                              job.status === 'cancelled' ? 'bg-red-100 text-red-700' :
-                                'bg-slate-100 text-slate-700'
+                        <span className={`inline-block px-3 py-1 text-xs font-bold rounded ${job.status === 'pending' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' :
+                          job.status === 'approved' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                            job.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                              job.status === 'cancelled' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                                'bg-muted text-muted-foreground'
                           }`}>
                           {job.status === 'pending' ? 'Onay Bekliyor' :
                             job.status === 'approved' ? 'Onaylandı' :
@@ -177,14 +177,14 @@ function IsEmirleriContent() {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => handleEdit(job)}
-                            className="px-3 py-1 rounded border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50"
+                            className="px-3 py-1 rounded border border-border text-xs font-bold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                           >
                             Düzenle
                           </button>
                           {canDelete && (
                             <button
                               onClick={() => handleDelete(job.id)}
-                              className="p-1.5 rounded text-red-500 hover:bg-red-50"
+                              className="p-1.5 rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
@@ -199,22 +199,22 @@ function IsEmirleriContent() {
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
-              <div className="text-sm text-slate-500">
+            <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
+              <div className="text-sm text-muted-foreground">
                 Toplam {totalCount} kayıt, Sayfa {page} / {totalPages}
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="flex items-center gap-1 rounded px-3 py-1.5 text-sm font-medium hover:bg-slate-100 disabled:opacity-50"
+                  className="flex items-center gap-1 rounded px-3 py-1.5 text-sm font-medium hover:bg-muted text-foreground disabled:opacity-50 disabled:text-muted-foreground"
                 >
                   <ChevronLeft className="h-4 w-4" /> Önceki
                 </button>
                 <button
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="flex items-center gap-1 rounded px-3 py-1.5 text-sm font-medium hover:bg-slate-100 disabled:opacity-50"
+                  className="flex items-center gap-1 rounded px-3 py-1.5 text-sm font-medium hover:bg-muted text-foreground disabled:opacity-50 disabled:text-muted-foreground"
                 >
                   Sonraki <ChevronRight className="h-4 w-4" />
                 </button>
