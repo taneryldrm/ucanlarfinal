@@ -2,10 +2,9 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-    let response = NextResponse.next({
-        request: {
-            headers: request.headers,
-        },
+    // IMPORTANT: Create a mutable response that we will return at the end
+    let supabaseResponse = NextResponse.next({
+        request,
     })
 
     const supabase = createServerClient(
@@ -17,9 +16,18 @@ export async function middleware(request: NextRequest) {
                     return request.cookies.getAll()
                 },
                 setAll(cookiesToSet) {
-                    cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+                    // First, set cookies on the request for downstream use
+                    cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+
+                    // CRITICAL: Create a new response to ensure cookies are properly set
+                    // This prevents the RSC payload from being displayed as raw text
+                    supabaseResponse = NextResponse.next({
+                        request,
+                    })
+
+                    // Set cookies on the response
                     cookiesToSet.forEach(({ name, value, options }) =>
-                        response.cookies.set(name, value, options)
+                        supabaseResponse.cookies.set(name, value, options)
                     )
                 },
             },
@@ -46,7 +54,7 @@ export async function middleware(request: NextRequest) {
             return NextResponse.redirect(url)
         }
         // If they are on login page, let them pass
-        return response;
+        return supabaseResponse;
     }
 
     // 3. Authenticated User Logic
@@ -114,7 +122,7 @@ export async function middleware(request: NextRequest) {
         }
     }
 
-    return response
+    return supabaseResponse
 }
 
 export const config = {
