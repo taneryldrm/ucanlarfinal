@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { createCustomer, updateCustomer } from "@/lib/supabaseQueries";
 import { toast } from "sonner";
+import { useTheme } from "@/components/ThemeProvider";
 
 interface NewCustomerModalProps {
     isOpen: boolean;
@@ -19,6 +20,8 @@ export function NewCustomerModal({ isOpen, onClose, initialData, onSuccess }: Ne
     const [type, setType] = useState(initialData?.type || "normal");
     const [phone, setPhone] = useState(initialData?.phone || "");
     const [taxId, setTaxId] = useState(initialData?.taxId || "");
+    const { theme } = useTheme();
+    const isPurple = theme === "purple";
 
     // Changed to array
     const [addresses, setAddresses] = useState<string[]>([""]);
@@ -121,16 +124,16 @@ export function NewCustomerModal({ isOpen, onClose, initialData, onSuccess }: Ne
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
-            <div className="w-full max-w-2xl rounded-xl bg-white shadow-2xl animate-in fade-in zoom-in duration-200">
+            <div className="w-full max-w-2xl rounded-xl bg-card shadow-2xl animate-in fade-in zoom-in duration-200 transition-colors">
 
                 {/* Modal Header */}
-                <div className="flex items-center justify-between border-b border-slate-100 p-6">
-                    <h2 className="text-xl font-bold text-slate-900">
+                <div className="flex items-center justify-between border-b border-border p-6">
+                    <h2 className="text-xl font-bold text-foreground">
                         {initialData ? "Müşteri Düzenle" : "Yeni Müşteri Ekle"}
                     </h2>
                     <button
                         onClick={onClose}
-                        className="rounded-lg p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors"
+                        className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                     >
                         <X className="h-5 w-5" />
                     </button>
@@ -141,7 +144,7 @@ export function NewCustomerModal({ isOpen, onClose, initialData, onSuccess }: Ne
 
                     {/* Müşteri Adı */}
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-slate-700">
+                        <label className="text-sm font-medium text-foreground">
                             Müşteri Adı <span className="text-red-500">*</span>
                         </label>
                         <input
@@ -149,17 +152,27 @@ export function NewCustomerModal({ isOpen, onClose, initialData, onSuccess }: Ne
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder="Müşteri adını girin..."
-                            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            className={cn(
+                                "w-full rounded-lg border px-4 py-2.5 text-sm text-foreground bg-background outline-none transition-colors",
+                                isPurple
+                                    ? "border-purple-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10"
+                                    : "border-border focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            )}
                         />
                     </div>
 
                     {/* Müşteri Tipi */}
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-slate-700">Müşteri Tipi</label>
+                        <label className="text-sm font-medium text-foreground">Müşteri Tipi</label>
                         <select
                             value={type}
                             onChange={(e) => setType(e.target.value)}
-                            className="w-full appearance-none rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            className={cn(
+                                "w-full appearance-none rounded-lg border bg-background px-4 py-2.5 text-sm text-foreground outline-none transition-colors",
+                                isPurple
+                                    ? "border-purple-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10"
+                                    : "border-border focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            )}
                         >
                             <option value="normal">Normal</option>
                             <option value="düzenli">Düzenli</option>
@@ -169,36 +182,49 @@ export function NewCustomerModal({ isOpen, onClose, initialData, onSuccess }: Ne
 
                     {/* Telefon */}
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-slate-700">Telefon</label>
+                        <label className="text-sm font-medium text-foreground">Telefon</label>
                         <input
                             type="text"
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
                             placeholder="Telefon numarası..."
-                            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            className={cn(
+                                "w-full rounded-lg border px-4 py-2.5 text-sm text-foreground bg-background outline-none transition-colors",
+                                isPurple
+                                    ? "border-purple-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10"
+                                    : "border-border focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            )}
                         />
                     </div>
 
                     {/* Vergi No */}
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-slate-700">Vergi No</label>
+                        <label className="text-sm font-medium text-foreground">Vergi No</label>
                         <input
                             type="text"
                             value={taxId}
                             onChange={(e) => setTaxId(e.target.value)}
                             placeholder="Vergi numarası..."
-                            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            className={cn(
+                                "w-full rounded-lg border px-4 py-2.5 text-sm text-foreground bg-background outline-none transition-colors",
+                                isPurple
+                                    ? "border-purple-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10"
+                                    : "border-border focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            )}
                         />
                     </div>
 
                     {/* Adresler */}
                     <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                            <label className="text-sm font-medium text-slate-700">Adresler</label>
+                            <label className="text-sm font-medium text-foreground">Adresler</label>
                             <button
                                 type="button"
                                 onClick={handleAddAddress}
-                                className="text-xs font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                                className={cn(
+                                    "text-xs font-medium flex items-center gap-1 transition-colors",
+                                    isPurple ? "text-purple-600 hover:text-purple-700" : "text-blue-600 hover:text-blue-700"
+                                )}
                             >
                                 <Plus className="h-3 w-3" />
                                 Adres Ekle
@@ -212,12 +238,15 @@ export function NewCustomerModal({ isOpen, onClose, initialData, onSuccess }: Ne
                                         value={addr}
                                         onChange={(e) => handleAddressChange(index, e.target.value)}
                                         placeholder={`Adres ${index + 1}...`}
-                                        className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500"
+                                        className={cn(
+                                            "w-full rounded-lg border px-4 py-2.5 text-sm text-foreground bg-background outline-none transition-colors",
+                                            isPurple ? "border-purple-200 focus:border-purple-500" : "border-border focus:border-blue-500"
+                                        )}
                                     />
                                     {addresses.length > 1 && (
                                         <button
                                             onClick={() => handleRemoveAddress(index)}
-                                            className="p-2.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                            className="p-2.5 text-muted-foreground hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                                             title="Adresi Sil"
                                         >
                                             <Trash2 className="h-4 w-4" />
@@ -230,31 +259,41 @@ export function NewCustomerModal({ isOpen, onClose, initialData, onSuccess }: Ne
 
                     {/* Açıklama */}
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-slate-700">Açıklama</label>
+                        <label className="text-sm font-medium text-foreground">Açıklama</label>
                         <textarea
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder="Müşteri hakkında notlar..."
                             rows={3}
-                            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            className={cn(
+                                "w-full rounded-lg border px-4 py-2.5 text-sm text-foreground bg-background outline-none transition-colors",
+                                isPurple
+                                    ? "border-purple-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10"
+                                    : "border-border focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            )}
                         />
                     </div>
 
                 </div>
 
                 {/* Modal Footer */}
-                <div className="flex justify-end gap-3 border-t border-slate-100 p-6 bg-slate-50 rounded-b-xl">
+                <div className="flex justify-end gap-3 border-t border-border p-6 bg-muted/50 rounded-b-xl">
                     <button
                         onClick={onClose}
                         disabled={loading}
-                        className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                        className="rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted disabled:opacity-50 transition-colors"
                     >
                         Vazgeç
                     </button>
                     <button
                         onClick={handleSave}
                         disabled={loading}
-                        className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700 shadow-md shadow-blue-200 disabled:opacity-50 flex items-center gap-2"
+                        className={cn(
+                            "rounded-lg px-6 py-2 text-sm font-medium text-white disabled:opacity-50 flex items-center gap-2 transition-colors",
+                            isPurple
+                                ? "bg-purple-600 hover:bg-purple-700 shadow-md shadow-purple-200"
+                                : "bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-200"
+                        )}
                     >
                         {loading && <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
                         Kaydet

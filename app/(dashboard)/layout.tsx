@@ -17,12 +17,12 @@ export default async function DashboardLayout({
     }
 
     return (
-        <div className="flex h-screen bg-slate-50 text-slate-900">
+        <div className="flex h-screen bg-background text-foreground transition-colors duration-300">
             <div className="hidden md:flex h-full">
                 <Sidebar />
             </div>
             <div className="flex flex-1 flex-col overflow-hidden">
-                <main className="flex-1 overflow-y-auto bg-slate-50">
+                <main className="flex-1 overflow-y-auto bg-background transition-colors duration-300">
                     {children}
                 </main>
             </div>

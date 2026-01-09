@@ -64,6 +64,79 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
   }
+
+  /* Purple Theme - Light Mode */
+  .purple {
+    --background: 270 50% 98%;
+    --foreground: 270 50% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 270 50% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 270 50% 10%;
+
+    --primary: 270 70% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 270 30% 92%;
+    --secondary-foreground: 270 50% 20%;
+
+    --muted: 270 20% 94%;
+    --muted-foreground: 270 15% 45%;
+
+    --accent: 270 40% 92%;
+    --accent-foreground: 270 50% 20%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 270 25% 85%;
+    --input: 270 25% 85%;
+    --ring: 270 70% 50%;
+
+    --sidebar-bg: 270 60% 25%;
+    --sidebar-text: 270 20% 95%;
+    --sidebar-hover: 270 50% 35%;
+    --sidebar-active: 270 70% 50%;
+  }
+
+  /* Purple Theme - Dark Mode */
+  .dark.purple,
+  .purple.dark {
+    --background: 270 50% 6%;
+    --foreground: 270 20% 95%;
+
+    --card: 270 45% 10%;
+    --card-foreground: 270 20% 95%;
+
+    --popover: 270 45% 10%;
+    --popover-foreground: 270 20% 95%;
+
+    --primary: 270 70% 60%;
+    --primary-foreground: 270 50% 10%;
+
+    --secondary: 270 35% 18%;
+    --secondary-foreground: 270 20% 95%;
+
+    --muted: 270 35% 18%;
+    --muted-foreground: 270 20% 60%;
+
+    --accent: 270 35% 20%;
+    --accent-foreground: 270 20% 95%;
+
+    --destructive: 0 62.8% 40%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 270 35% 20%;
+    --input: 270 35% 20%;
+    --ring: 270 60% 70%;
+
+    --sidebar-bg: 270 50% 8%;
+    --sidebar-text: 270 20% 85%;
+    --sidebar-hover: 270 45% 15%;
+    --sidebar-active: 270 70% 55%;
+  }
 }
 
 @layer base {
@@ -76,4 +149,133 @@
   }
 }
 
-/* Force rebuild */
+/* Purple Theme Overrides - Blue to Purple conversion */
+.purple .bg-blue-600 {
+  background-color: rgb(147 51 234) !important;
+}
+
+/* purple-600 */
+.purple .bg-blue-700 {
+  background-color: rgb(126 34 206) !important;
+}
+
+/* purple-700 */
+.purple .bg-blue-500 {
+  background-color: rgb(168 85 247) !important;
+}
+
+/* purple-500 */
+.purple .bg-blue-50 {
+  background-color: rgb(250 245 255) !important;
+}
+
+/* purple-50 */
+.purple .bg-blue-100 {
+  background-color: rgb(243 232 255) !important;
+}
+
+/* purple-100 */
+
+.purple .text-blue-600 {
+  color: rgb(147 51 234) !important;
+}
+
+.purple .text-blue-700 {
+  color: rgb(126 34 206) !important;
+}
+
+.purple .text-blue-500 {
+  color: rgb(168 85 247) !important;
+}
+
+.purple .border-blue-600 {
+  border-color: rgb(147 51 234) !important;
+}
+
+.purple .border-blue-500 {
+  border-color: rgb(168 85 247) !important;
+}
+
+.purple .border-blue-200 {
+  border-color: rgb(233 213 255) !important;
+}
+
+.purple .shadow-blue-200 {
+  --tw-shadow-color: rgb(233 213 255) !important;
+}
+
+.purple .shadow-blue-900\/20 {
+  --tw-shadow-color: rgb(88 28 135 / 0.2) !important;
+}
+
+.purple .ring-blue-500\/10 {
+  --tw-ring-color: rgb(168 85 247 / 0.1) !important;
+}
+
+.purple .hover\:bg-blue-700:hover {
+  background-color: rgb(126 34 206) !important;
+}
+
+.purple .hover\:bg-blue-600:hover {
+  background-color: rgb(147 51 234) !important;
+}
+
+.purple .hover\:bg-blue-50:hover {
+  background-color: rgb(250 245 255) !important;
+}
+
+.purple .hover\:text-blue-600:hover {
+  color: rgb(147 51 234) !important;
+}
+
+.purple .hover\:text-blue-700:hover {
+  color: rgb(126 34 206) !important;
+}
+
+.purple .focus\:border-blue-500:focus {
+  border-color: rgb(168 85 247) !important;
+}
+
+.purple .focus\:ring-blue-500:focus {
+  --tw-ring-color: rgb(168 85 247) !important;
+}
+
+.purple .focus\:ring-blue-500\/10:focus {
+  --tw-ring-color: rgb(168 85 247 / 0.1) !important;
+}
+
+/* Modal and Card backgrounds for purple theme */
+.purple .bg-white {
+  background-color: hsl(var(--card)) !important;
+}
+
+.purple .bg-slate-50 {
+  background-color: hsl(var(--muted)) !important;
+}
+
+.purple .bg-slate-100 {
+  background-color: hsl(var(--secondary)) !important;
+}
+
+.purple .border-slate-100,
+.purple .border-slate-200 {
+  border-color: hsl(var(--border)) !important;
+}
+
+.purple .text-slate-900,
+.purple .text-slate-800,
+.purple .text-slate-700 {
+  color: hsl(var(--foreground)) !important;
+}
+
+.purple .text-slate-600,
+.purple .text-slate-500,
+.purple .text-slate-400 {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+/* Smooth transitions */
+.purple * {
+  transition-property: background-color, border-color, color;
+  transition-duration: 200ms;
+}
