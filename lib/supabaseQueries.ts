@@ -686,14 +686,14 @@ export const getCustomerPerformanceStats = async () => {
         if (!customers) return [];
 
         const { data: collections } = await supabase.from('collections').select('customer_id, amount');
-        const { data: workOrders } = await supabase.from('work_orders').select('customer_id, amount, status');
+        const { data: workOrders } = await supabase.from('work_orders').select('customer_id, price, status');
 
         // Aggregate
         const report = customers.map(c => {
             const customerCollections = collections?.filter(col => col.customer_id === c.id) || [];
             const customerOrders = workOrders?.filter(wo => wo.customer_id === c.id) || [];
 
-            const billed = customerOrders.reduce((sum, order) => sum + (order.amount || 0), 0);
+            const billed = customerOrders.reduce((sum, order) => sum + (order.price || 0), 0);
             const collected = customerCollections.reduce((sum, col) => sum + (col.amount || 0), 0);
             const pending = Math.max(0, billed - collected);
             const jobs = customerOrders.length;
@@ -727,8 +727,8 @@ export const createPersonnel = async (personnel: any) => {
         .from('personnel')
         .insert([{
             full_name: personnel.name,
-            phone: personnel.phone,
-            tc_no: personnel.tc,
+            phone: personnel.phone || null,
+            tc_no: personnel.tc || null, // TC boşsa null gönder
             status: personnel.status,
             role: 'Personel' // Default role
         }])
@@ -1100,8 +1100,7 @@ export const getPersonnelById = async (id: string) => {
                 price
             )
         `)
-        .eq('personnel_id', id)
-        .order('created_at', { ascending: false }); // ordering by assignment creation roughly maps to date, or sort manually
+        .eq('personnel_id', id);
 
     if (jobsError) console.error("Jobs fetch error:", jobsError);
 
@@ -1536,71 +1535,100 @@ export const approveWorkOrder = async (id: string) => {
 // --- Daily Cash Page Functions ---
 
 export const getDailyTransactions = async (date: string) => {
-    const { data: collections, error: colError } = await supabase
-        .from('collections')
-        .select('*, customers(name)')
-        .eq('date', date)
-        .order('created_at', { ascending: true });
+    // Use Promise.allSettled for resilience - if one query fails, others still work
+    const [
+        collectionsRes,
+        expensesRes,
+        todayPayrollRes,
+        allPayrollRes,
+        prevColRes,
+        prevExpRes,
+        prevPayrollRes
+    ] = await Promise.allSettled([
+        supabase
+            .from('collections')
+            .select('*, customers(name)')
+            .eq('date', date),
+        supabase
+            .from('expenses')
+            .select('*')
+            .eq('date', date),
+        // Today's paid wages
+        supabase
+            .from('payroll_records')
+            .select('paid_amount')
+            .eq('date', date),
+        // Total wage debt (all time)
+        supabase
+            .from('payroll_records')
+            .select('daily_wage, paid_amount'),
+        // Previous Collections (all for filtering later)  
+        supabase
+            .from('collections')
+            .select('amount, payment_method')
+            .lt('date', date),
+        // Previous Expenses (all for filtering later)
+        supabase
+            .from('expenses')
+            .select('amount, payment_method')
+            .lt('date', date),
+        // Previous paid wages
+        supabase
+            .from('payroll_records')
+            .select('paid_amount')
+            .lt('date', date)
+    ]);
 
-    if (colError) {
-        console.error("Collection error:", colError);
-        // Return empty on error to prevent total crash, or throw? Throwing is better for debug.
-        throw colError;
-    }
+    // Extract data safely
+    const collections = collectionsRes.status === 'fulfilled' && !collectionsRes.value.error
+        ? collectionsRes.value.data ?? []
+        : [];
 
-    const { data: expenses, error: expError } = await supabase
-        .from('expenses')
-        .select('*')
-        .eq('date', date)
-        .order('created_at', { ascending: true });
+    const expenses = expensesRes.status === 'fulfilled' && !expensesRes.value.error
+        ? expensesRes.value.data ?? []
+        : [];
 
-    if (expError) {
-        console.error("Expense error:", expError);
-        throw expError;
-    }
+    const todayPayroll = todayPayrollRes.status === 'fulfilled' && !todayPayrollRes.value.error
+        ? todayPayrollRes.value.data ?? []
+        : [];
+
+    const allPayroll = allPayrollRes.status === 'fulfilled' && !allPayrollRes.value.error
+        ? allPayrollRes.value.data ?? []
+        : [];
+
+    const prevCol = prevColRes.status === 'fulfilled' && !prevColRes.value.error
+        ? prevColRes.value.data ?? []
+        : [];
+
+    const prevExp = prevExpRes.status === 'fulfilled' && !prevExpRes.value.error
+        ? prevExpRes.value.data ?? []
+        : [];
+
+    const prevPayroll = prevPayrollRes.status === 'fulfilled' && !prevPayrollRes.value.error
+        ? prevPayrollRes.value.data ?? []
+        : [];
 
     // --- Payroll Data ---
-    const { data: todayPayroll } = await supabase
-        .from('payroll_records')
-        .select('paid_amount')
-        .eq('date', date);
-
-    const todayPaidWages = (todayPayroll || []).reduce((acc, p) => acc + (p.paid_amount || 0), 0);
-
-    const { data: allPayroll } = await supabase
-        .from('payroll_records')
-        .select('daily_wage, paid_amount');
-
-    const totalWageDebt = (allPayroll || []).reduce((acc, p) => acc + ((p.daily_wage || 0) - (p.paid_amount || 0)), 0);
+    const todayPaidWages = todayPayroll.reduce((sum, p) => sum + (p.paid_amount || 0), 0);
+    const totalWageDebt = allPayroll.reduce((sum, p) => sum + ((p.daily_wage || 0) - (p.paid_amount || 0)), 0);
 
     // --- Calculate Previous Balance (Dünden Kasa Devri) ---
-    // Sum of all CASH income - Sum of all CASH expense before this date
+    // Filter for cash payments in JavaScript (avoids ENUM type issues)
+    const isCashPayment = (method: string | null | undefined): boolean => {
+        if (!method) return false;
+        const normalizedMethod = method.toLowerCase().trim();
+        return normalizedMethod === 'nakit' || normalizedMethod === 'cash';
+    };
 
-    // Previous Collections (Cash)
-    const { data: prevCol, error: prevColErr } = await supabase
-        .from('collections')
-        .select('amount')
-        .lt('date', date)
-        .in('payment_method', ['nakit', 'Nakit', 'NAKİT', 'Cash', 'cash']);
+    const totalPrevCol = prevCol
+        .filter(c => isCashPayment(c.payment_method))
+        .reduce((sum, c) => sum + (c.amount || 0), 0);
 
-    // Previous Expenses (Cash)
-    // Note: Expenses might use Capitalized 'Nakit' based on enum error history
-    // Previous Expenses (Cash)
-    const { data: prevExp, error: prevExpErr } = await supabase
-        .from('expenses')
-        .select('amount')
-        .lt('date', date)
-        .in('payment_method', ['nakit', 'Nakit', 'NAKİT', 'Cash', 'cash']);
+    const totalPrevExp = prevExp
+        .filter(e => isCashPayment(e.payment_method))
+        .reduce((sum, e) => sum + (e.amount || 0), 0);
 
-    // Previous Wages (Cash)
-    const { data: prevPayroll } = await supabase
-        .from('payroll_records')
-        .select('paid_amount')
-        .lt('date', date);
-
-    const totalPrevCol = prevCol?.reduce((a, b) => a + (b.amount || 0), 0) || 0;
-    const totalPrevExp = prevExp?.reduce((a, b) => a + (b.amount || 0), 0) || 0;
-    const totalPrevWages = prevPayroll?.reduce((a, b) => a + (b.paid_amount || 0), 0) || 0;
+    const totalPrevWages = prevPayroll.reduce((sum, p) => sum + (p.paid_amount || 0), 0);
 
     const previousBalance = totalPrevCol - totalPrevExp - totalPrevWages;
 
@@ -1608,7 +1636,7 @@ export const getDailyTransactions = async (date: string) => {
         previousBalance,
         todayPaidWages,
         totalWageDebt,
-        collections: collections.map(c => ({
+        collections: collections.map((c: any) => ({
             id: c.id,
             customer_id: c.customer_id,
             customer: c.customers?.name || 'Bilinmiyor',
@@ -1617,10 +1645,10 @@ export const getDailyTransactions = async (date: string) => {
             type: c.payment_method || 'Nakit',
             payment_method: c.payment_method
         })),
-        expenses: expenses.map(e => ({
+        expenses: expenses.map((e: any) => ({
             id: e.id,
             detail: e.description,
-            receiptNo: e.receipt_no || e.bill_no || '', // Prefer receipt_no, fallback bill_no
+            receiptNo: e.receipt_no || '', // removed bill_no as it doesn't exist
             amount: e.amount,
             date: e.date,
             method: e.payment_method || 'Nakit',

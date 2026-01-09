@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { getCustomers, getPersonnel } from "@/lib/supabaseQueries";
 import { toast } from "sonner";
 import { NewCustomerModal } from "./NewCustomerModal";
+import { NewPersonnelModal } from "./NewPersonnelModal";
 
 interface NewJobModalProps {
     isOpen: boolean;
@@ -24,6 +25,9 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
 
     // New Customer Modal State
     const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
+
+    // New Personnel Modal State
+    const [isNewPersonnelModalOpen, setIsNewPersonnelModalOpen] = useState(false);
 
     // Staff Search State
     const [staffSearch, setStaffSearch] = useState("");
@@ -54,7 +58,7 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
     // Initial Load for Staff
     useEffect(() => {
         if (isOpen) {
-            getPersonnel(1, 50).then(res => {
+            getPersonnel(1, 1000).then(res => {
                 if (res.data) setFoundStaff(res.data);
             });
         }
@@ -345,9 +349,30 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
 
                     {/* Personel Seçimi */}
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-slate-900">
-                            Personel Seçimi <span className="text-xs font-normal text-slate-500">(Opsiyonel)</span>
-                        </label>
+                        <div className="flex items-center justify-between">
+                            <label className="text-sm font-bold text-slate-900">
+                                Personel Seçimi <span className="text-xs font-normal text-slate-500">(Opsiyonel)</span>
+                            </label>
+                            <button
+                                onClick={() => setIsNewPersonnelModalOpen(true)}
+                                className="flex items-center gap-1 rounded border border-slate-200 px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                            >
+                                <Plus className="h-3 w-3" />
+                                Yeni Personel Ekle
+                            </button>
+                        </div>
+
+                        <NewPersonnelModal
+                            isOpen={isNewPersonnelModalOpen}
+                            onClose={() => setIsNewPersonnelModalOpen(false)}
+                            onSuccess={(newPersonnel) => {
+                                // Yeni personeli listeye ekle
+                                setFoundStaff(prev => [...prev, newPersonnel]);
+                                // Otomatik olarak seç
+                                setSelectedStaffIds(prev => [...prev, newPersonnel.id]);
+                            }}
+                        />
+
                         <div className="rounded-lg border border-slate-200 p-4 space-y-3">
                             <div className="relative mb-3">
                                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
