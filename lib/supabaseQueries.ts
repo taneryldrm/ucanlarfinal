@@ -883,80 +883,48 @@ export const getTransactions = async (
 };
 
 // 4. Pending Collections Pagination
-// 4. Pending Collections Pagination (Refactored for Correctness)
-// 4. Pending Collections (Modified: Future Approved Work only)
+// DÜZELTME: Sadece gelecek tarihli onaylanmış iş emirlerinin tutarını göster
+// Eski borçları dahil etme - her iş emri kendi tutarı kadar bekleyen tahsilat oluşturur
 export const getPendingCollectionsPaginated = async (
     page: number = 1,
     pageSize: number = 20,
     search: string = ''
 ) => {
     // Strategy:
-    // User requested "Pending Collection" -> Should reflect "Net Balance" (Receivables).
-    // Original Logic Scope: Customers with Future Approved Work.
-    // New Logic: For those customers, calculate (Total Debt - Total Paid).
+    // ONLY show the sum of FUTURE APPROVED work orders as pending collection
+    // Do NOT include historical debt - each approved work order creates its own pending amount
 
     const now = new Date();
     const todayStr = now.toISOString().split('T')[0];
 
-    // Step 1: Get all future approved work orders to identify candidates
+    // Step 1: Get all future approved work orders with their prices
     const { data: futureWorkOrders } = await supabase
         .from('work_orders')
-        .select('customer_id, date')
+        .select('customer_id, price, date')
         .gte('date', todayStr) // Today and future
-        .eq('status', 'onaylandı'); // Only approved assignments
+        .eq('status', 'onaylandı'); // Only approved
 
     if (!futureWorkOrders || futureWorkOrders.length === 0) return { data: [], count: 0 };
 
-    const relevantCustomerIds = Array.from(new Set(futureWorkOrders.map(wo => wo.customer_id).filter(Boolean)));
+    // Step 2: Calculate pending amounts PER CUSTOMER from ONLY future approved work orders
+    const pendingMap: Record<string, number> = {};
+    const lastDateMap: Record<string, string> = {};
 
-    if (relevantCustomerIds.length === 0) return { data: [], count: 0 };
-
-    // Step 2: Calculate Balances for these customers
-    // We need to fetch ALL history for these specific customers to get the true balance.
-    // Optimization: Split huge lists if necessary, but assuming reasonable size.
-
-    // 2a. Fetch All Work Orders (Debt) for these customers
-    const { data: allWorkOrders } = await supabase
-        .from('work_orders')
-        .select('customer_id, price')
-        .in('customer_id', relevantCustomerIds);
-
-    // 2b. Fetch All Collections (Paid) for these customers
-    const { data: allCollections } = await supabase
-        .from('collections')
-        .select('customer_id, amount')
-        .in('customer_id', relevantCustomerIds);
-
-    // 2c. Calculate Net Balance
-    const balanceMap: Record<string, number> = {};
-    const lastDateMap: Record<string, string> = {}; // Track nearest future date
-
-    // Initialize
-    relevantCustomerIds.forEach(id => {
-        balanceMap[id] = 0;
-        lastDateMap[id] = '9999-12-31';
-    });
-
-    // Sum Debt
-    allWorkOrders?.forEach(wo => {
-        if (balanceMap[wo.customer_id] !== undefined) {
-            balanceMap[wo.customer_id] += (wo.price || 0);
-        }
-    });
-
-    // Subtract Paid
-    allCollections?.forEach(c => {
-        if (balanceMap[c.customer_id] !== undefined) {
-            balanceMap[c.customer_id] -= (c.amount || 0);
-        }
-    });
-
-    // Find nearest future date
     futureWorkOrders.forEach(wo => {
-        if (wo.customer_id && wo.date < lastDateMap[wo.customer_id]) {
+        if (!wo.customer_id) return;
+
+        // Sum only future approved work order prices
+        pendingMap[wo.customer_id] = (pendingMap[wo.customer_id] || 0) + (wo.price || 0);
+
+        // Track nearest future date
+        if (!lastDateMap[wo.customer_id] || wo.date < lastDateMap[wo.customer_id]) {
             lastDateMap[wo.customer_id] = wo.date;
         }
     });
+
+    const relevantCustomerIds = Object.keys(pendingMap).filter(id => pendingMap[id] > 0);
+
+    if (relevantCustomerIds.length === 0) return { data: [], count: 0 };
 
     // Step 3: Fetch Customer Details (with Search)
     let customerQuery = supabase
@@ -972,18 +940,15 @@ export const getPendingCollectionsPaginated = async (
 
     if (!customers) return { data: [], count: 0 };
 
-    // Step 4: Map, Filter, Sort
+    // Step 4: Map, Sort
     const finalResults = customers
-        .map(c => {
-            const balance = balanceMap[c.id] || 0;
-            return {
-                ...c,
-                pending: balance,
-                lastTransactionDate: lastDateMap[c.id]
-            };
-        })
-        .filter(c => c.pending > 0) // Only show if they actually owe money
-        .sort((a, b) => b.pending - a.pending); // Sort by highest debt
+        .map(c => ({
+            ...c,
+            pending: pendingMap[c.id] || 0,
+            lastTransactionDate: lastDateMap[c.id]
+        }))
+        .filter(c => c.pending > 0)
+        .sort((a, b) => b.pending - a.pending);
 
     // Step 5: Paginate
     const totalCount = finalResults.length;
