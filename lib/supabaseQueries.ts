@@ -1499,6 +1499,10 @@ export const approveWorkOrder = async (id: string) => {
 
 // --- Daily Cash Page Functions ---
 
+// KASA RESET DATE: Kasa devri bu tarihten itibaren hesaplanır.
+// Bu tarihten önceki veriler "Dünden Kasa Devri" hesabına dahil edilmez.
+const KASA_START_DATE = '2026-01-10';
+
 export const getDailyTransactions = async (date: string) => {
     // Use Promise.allSettled for resilience - if one query fails, others still work
     const [
@@ -1523,24 +1527,28 @@ export const getDailyTransactions = async (date: string) => {
             .from('payroll_records')
             .select('paid_amount')
             .eq('date', date),
-        // Total wage debt (all time)
+        // Total wage debt (all time - from KASA_START_DATE onwards)
         supabase
             .from('payroll_records')
-            .select('daily_wage, paid_amount'),
-        // Previous Collections (all for filtering later)  
+            .select('daily_wage, paid_amount')
+            .gte('date', KASA_START_DATE),
+        // Previous Collections (from KASA_START_DATE to selected date)  
         supabase
             .from('collections')
             .select('amount, payment_method')
+            .gte('date', KASA_START_DATE)
             .lt('date', date),
-        // Previous Expenses (all for filtering later)
+        // Previous Expenses (from KASA_START_DATE to selected date)
         supabase
             .from('expenses')
             .select('amount, payment_method')
+            .gte('date', KASA_START_DATE)
             .lt('date', date),
-        // Previous paid wages
+        // Previous paid wages (from KASA_START_DATE to selected date)
         supabase
             .from('payroll_records')
             .select('paid_amount')
+            .gte('date', KASA_START_DATE)
             .lt('date', date)
     ]);
 
