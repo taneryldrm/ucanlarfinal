@@ -158,18 +158,19 @@ function IsEmirleriContent() {
                       </td>
                       <td className="px-4 py-4 font-bold text-slate-900">
                         ₺{(job.amount || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
+                        {job.has_vat && <span className="text-xs text-slate-500 ml-1 font-normal">+ KDV</span>}
                       </td>
                       <td className="px-4 py-4">
-                        <span className={`inline-block px-3 py-1 text-xs font-bold rounded ${job.status === 'pending' ? 'bg-orange-100 text-orange-700' :
-                          job.status === 'approved' ? 'bg-blue-100 text-blue-700' :
-                            job.status === 'completed' ? 'bg-green-100 text-green-700' :
-                              job.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                        <span className={`inline-block px-3 py-1 text-xs font-bold rounded ${(job.status === 'pending' || job.status === 'onaylanmadı') ? 'bg-orange-100 text-orange-700' :
+                          (job.status === 'approved' || job.status === 'onaylandı') ? 'bg-blue-100 text-blue-700' :
+                            (job.status === 'completed' || job.status === 'tamamlandı') ? 'bg-green-100 text-green-700' :
+                              (job.status === 'cancelled' || job.status === 'iptal') ? 'bg-red-100 text-red-700' :
                                 'bg-slate-100 text-slate-700'
                           }`}>
-                          {job.status === 'pending' ? 'Onay Bekliyor' :
-                            job.status === 'approved' ? 'Onaylandı' :
-                              job.status === 'completed' ? 'Tamamlandı' :
-                                job.status === 'cancelled' ? 'İptal' :
+                          {(job.status === 'pending' || job.status === 'onaylanmadı') ? 'Onay Bekliyor' :
+                            (job.status === 'approved' || job.status === 'onaylandı') ? 'Onaylandı' :
+                              (job.status === 'completed' || job.status === 'tamamlandı') ? 'Tamamlandı' :
+                                (job.status === 'cancelled' || job.status === 'iptal') ? 'İptal' :
                                   job.status}
                         </span>
                       </td>

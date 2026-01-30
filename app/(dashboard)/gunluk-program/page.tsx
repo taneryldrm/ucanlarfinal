@@ -61,7 +61,11 @@ export default function GunlukProgramPage() {
     // User logic was client side mock.
     // Let's implement loop for now (safest without new backend func)
     try {
-      const pending = jobs.filter(j => j.status === 'pending');
+      const pending = jobs.filter(j => j.status === 'onaylanmadı' || j.status === 'pending');
+      if (pending.length === 0) {
+        toast.info("Onaylanacak iş bulunamadı.");
+        return;
+      }
       await Promise.all(pending.map(j => approveWorkOrder(j.id)));
       toast.success("Tüm işler onaylandı.");
       fetchDailyJobs();
@@ -180,18 +184,18 @@ export default function GunlukProgramPage() {
                         <td className="px-4 py-4">
                           <span className={cn(
                             "inline-block px-3 py-1 text-xs font-bold rounded",
-                            job.status === "approved" ? "bg-green-100 text-green-700" :
-                              job.status === "pending" ? "bg-orange-100 text-orange-700" :
+                            (job.status === "approved" || job.status === "onaylandı") ? "bg-green-100 text-green-700" :
+                              (job.status === "pending" || job.status === "onaylanmadı") ? "bg-orange-100 text-orange-700" :
                                 "bg-slate-100 text-slate-700"
                           )}>
-                            {job.status === 'pending' ? 'Onay Bekliyor' :
-                              job.status === 'approved' ? 'Onaylandı' :
+                            {(job.status === 'pending' || job.status === 'onaylanmadı') ? 'Onay Bekliyor' :
+                              (job.status === 'approved' || job.status === 'onaylandı') ? 'Onaylandı' :
                                 job.status}
                           </span>
                         </td>
                         <td className="px-4 py-4">
                           <div className="flex items-center justify-end" onClick={(e) => e.stopPropagation()}>
-                            {job.status !== "approved" && canApprove && (
+                            {job.status !== "approved" && job.status !== "onaylandı" && canApprove && (
                               <button
                                 onClick={() => handleApprove(job.id)}
                                 className="px-4 py-1.5 rounded border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm"
@@ -199,7 +203,7 @@ export default function GunlukProgramPage() {
                                 Onayla
                               </button>
                             )}
-                            {job.status === "approved" && (
+                            {((job.status === "approved" || job.status === "onaylandı")) && (
                               <span className="flex items-center gap-1 text-green-600 text-xs font-bold px-4 py-1.5">
                                 <Check className="h-4 w-4" />
                                 Onaylandı
@@ -256,12 +260,12 @@ export default function GunlukProgramPage() {
                   <div className="mt-1">
                     <span className={cn(
                       "inline-block px-3 py-1 text-xs font-bold rounded",
-                      selectedJob.status === "approved" ? "bg-green-100 text-green-700" :
-                        selectedJob.status === "pending" ? "bg-orange-100 text-orange-700" :
+                      (selectedJob.status === "approved" || selectedJob.status === "onaylandı") ? "bg-green-100 text-green-700" :
+                        (selectedJob.status === "pending" || selectedJob.status === "onaylanmadı") ? "bg-orange-100 text-orange-700" :
                           "bg-slate-100 text-slate-700"
                     )}>
-                      {selectedJob.status === 'pending' ? 'Onay Bekliyor' :
-                        selectedJob.status === 'approved' ? 'Onaylandı' :
+                      {(selectedJob.status === 'pending' || selectedJob.status === 'onaylanmadı') ? 'Onay Bekliyor' :
+                        (selectedJob.status === 'approved' || selectedJob.status === 'onaylandı') ? 'Onaylandı' :
                           selectedJob.status}
                     </span>
                   </div>
@@ -290,7 +294,7 @@ export default function GunlukProgramPage() {
                 >
                   Kapat
                 </button>
-                {selectedJob.status !== "approved" && canApprove && (
+                {selectedJob.status !== "approved" && selectedJob.status !== "onaylandı" && canApprove && (
                   <button
                     onClick={() => {
                       handleApprove(selectedJob.id);

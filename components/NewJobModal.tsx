@@ -42,6 +42,7 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
     const [description, setDescription] = useState(initialData?.description || "");
     const [address, setAddress] = useState(initialData?.address || "");
     const [amount, setAmount] = useState(initialData?.amount || "");
+    const [hasVat, setHasVat] = useState(initialData?.has_vat || false);
 
     // Recurring State
     const [isRecurring, setIsRecurring] = useState(false);
@@ -81,6 +82,7 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                 // Ensuring 0 is treated as a value, but undefined/null as empty.
                 const initialAmount = initialData.amount !== undefined && initialData.amount !== null ? String(initialData.amount) : "";
                 setAmount(initialAmount);
+                setHasVat(initialData.has_vat || false);
 
                 setStaffCount(initialData.personnel_count || 1);
                 setSelectedStaffIds(initialData.assigned_staff || []);
@@ -94,6 +96,7 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                 setDescription("");
                 setAddress("");
                 setAmount(""); // Force empty string to show placeholder
+                setHasVat(false);
                 setStaffCount(1);
                 setSelectedStaffIds([]);
                 setIsRecurring(false);
@@ -191,6 +194,7 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
             description,
             address,
             price: parseFloat(amount || "0"),
+            has_vat: hasVat,
             personnel_count: staffCount,
             is_recurring: isRecurring,
             frequency: isRecurring ? frequency : null,
@@ -442,18 +446,29 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                         </div>
                     </div>
 
-                    {/* Tutar */}
+                    {/* Tutar ve KDV */}
                     <div className="space-y-2">
                         <label className="text-sm font-bold text-slate-900">
                             Tutar (₺) <span className="text-red-500">*</span>
                         </label>
-                        <input
-                            type="number"
-                            value={amount}
-                            onChange={(e) => setAmount(e.target.value)}
-                            placeholder="0.00"
-                            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
-                        />
+                        <div className="flex items-center gap-4">
+                            <input
+                                type="number"
+                                value={amount}
+                                onChange={(e) => setAmount(e.target.value)}
+                                placeholder="0.00"
+                                className="flex-1 rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            />
+                            <label className="flex items-center gap-2 cursor-pointer bg-slate-50 px-3 py-2.5 rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors">
+                                <input
+                                    type="checkbox"
+                                    checked={hasVat}
+                                    onChange={(e) => setHasVat(e.target.checked)}
+                                    className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                />
+                                <span className="text-sm font-bold text-slate-700 whitespace-nowrap">+ KDV</span>
+                            </label>
+                        </div>
                     </div>
 
                     {/* Tekrarlayan İş Emri */}
@@ -585,7 +600,7 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                     </button>
                 </div>
 
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

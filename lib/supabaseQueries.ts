@@ -38,6 +38,7 @@ export interface WorkOrderRow {
     description: string | null
     address: string | null
     price: number | null
+    has_vat?: boolean
     work_order_assignments: { personnel_id: string | null, personnel: { id: string, full_name: string } | null }[] | null
     customers: { id: string, name: string } | null
 }
@@ -1394,9 +1395,10 @@ export const createWorkOrder = async (workOrder: any) => {
     const payloads = datesToInsert.map((d, index) => ({
         customer_id: workOrder.customer_id,
         date: d,
-        description: workOrder.description + (index > 0 ? ' (Tekrar)' : ''), // Mark recurring
-        address: workOrder.address,
+        description: (workOrder.description || '') + (index > 0 ? ' (Tekrar)' : ''),
+        address: workOrder.address || '',
         price: workOrder.price,
+        has_vat: workOrder.has_vat || false,
         personnel_count: workOrder.personnel_count,
         status: 'onaylanmadı'
     }));
@@ -1442,6 +1444,7 @@ export const updateWorkOrder = async (id: string, workOrder: any) => {
             description: workOrder.description,
             address: workOrder.address,
             price: workOrder.price,
+            has_vat: workOrder.has_vat,
             personnel_count: workOrder.personnel_count,
         })
         .eq('id', id)
