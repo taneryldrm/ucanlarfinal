@@ -34,6 +34,8 @@ function GunlukKasaContent() {
     amount: prefillAmount
   } : null;
 
+  const [prefillConsumed, setPrefillConsumed] = useState(false);
+
   // Enum Mapping Helpers
   const mapPaymentMethodToDb = (uiValue: string) => {
     const map: Record<string, string> = {
@@ -126,8 +128,10 @@ function GunlukKasaContent() {
       if (isNew) {
         await createCollection(payload);
 
+        // Mark prefill as consumed so the next empty row doesn't auto-fill again
+        setPrefillConsumed(true);
+
         // Clear URL params if we just saved a prefilled new record
-        // This prevents the next empty row from auto-filling again
         if (searchParams.get('customerId')) {
           const newParams = new URLSearchParams(searchParams.toString());
           newParams.delete('customerId');
@@ -279,7 +283,7 @@ function GunlukKasaContent() {
                   {collectionRows.map((_, i) => {
                     // Pass prefill data only for the FIRST empty row (i === 0)
                     // AND if we have prefill data available
-                    const rowPrefill = (i === 0 && prefillData) ? prefillData : null;
+                    const rowPrefill = (i === 0 && prefillData && !prefillConsumed) ? prefillData : null;
 
                     return (
                       <CollectionRow

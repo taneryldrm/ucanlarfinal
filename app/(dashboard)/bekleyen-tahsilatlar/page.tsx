@@ -20,15 +20,10 @@ export default function BekleyenTahsilatlarPage() {
     async function fetchCollections() {
         setLoading(true);
         try {
-            const { data, count } = await getPendingCollectionsPaginated(page, pageSize, searchTerm);
+            const { data, count, totalAmount } = await getPendingCollectionsPaginated(page, pageSize, searchTerm);
             setPendingCollections(data || []);
             setTotalCount(count || 0);
-
-            // Calculate total pending for the page (or ideally global if possible, but let's just sum current page for the card for now to show movement)
-            // or we need a global sum query.
-            // For now, let's sum the fetched page.
-            const sum = data?.reduce((acc: number, curr: any) => acc + (curr.pending || 0), 0) || 0;
-            setTotalPendingAmount(sum);
+            setTotalPendingAmount(totalAmount || 0);
         } catch (error) {
             console.error(error);
         } finally {
@@ -55,7 +50,7 @@ export default function BekleyenTahsilatlarPage() {
                     <h2 className="text-2xl font-bold text-slate-800">Bekleyen Tahsilatlar</h2>
                     <div className="flex items-center gap-2 rounded-lg bg-orange-50 px-3 py-1 text-sm font-medium text-orange-700 border border-orange-100">
                         <CreditCard className="h-4 w-4" />
-                        Toplam Bekleyen (Bu Sayfa): <span className="font-bold">₺{totalPendingAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</span>
+                        Toplam Bekleyen: <span className="font-bold">₺{totalPendingAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</span>
                     </div>
                 </div>
 
@@ -100,7 +95,7 @@ export default function BekleyenTahsilatlarPage() {
                                         <tr key={index} className="group hover:bg-slate-50/50 transition-colors">
                                             <td className="px-4 py-4 font-bold text-slate-800">{item.name}</td>
                                             <td className="px-4 py-4 text-slate-600">{item.phone || '-'}</td>
-                                            <td className="px-4 py-4 text-slate-600">{item.lastTransactionDate}</td>
+                                            <td className="px-4 py-4 text-slate-600">{item.lastTransactionDate ? new Date(item.lastTransactionDate).toLocaleDateString('tr-TR') : '-'}</td>
                                             <td className="px-4 py-4 text-right font-bold text-orange-600">
                                                 ₺{item.pending.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
                                             </td>

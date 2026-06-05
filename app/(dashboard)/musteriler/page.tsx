@@ -212,7 +212,7 @@ export default function MusterilerPage() {
                         {customer.address}
                       </td>
                       <td className="px-6 py-4 font-bold text-foreground">
-                        ₺{(customer.balance || 0).toFixed(2).replace('.', ',')}
+                        ₺{(customer.current_balance || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-center gap-2">

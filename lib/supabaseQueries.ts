@@ -293,6 +293,7 @@ export const getCustomers = async (
     const to = from + pageSize - 1;
 
     const { data, error, count } = await query
+        .order('current_balance', { ascending: false, nullsFirst: false })
         .order('name')
         .range(from, to);
 
@@ -915,7 +916,7 @@ export const getPendingCollectionsPaginated = async (
         if (!wo.customer_id) return;
 
         // Sum only future approved work order prices
-        pendingMap[wo.customer_id] = (pendingMap[wo.customer_id] || 0) + (wo.price || 0);
+        pendingMap[wo.customer_id] = (pendingMap[wo.customer_id] || 0) + (Number(wo.price) || 0);
 
         // Track nearest future date
         if (!lastDateMap[wo.customer_id] || wo.date < lastDateMap[wo.customer_id]) {
@@ -923,11 +924,29 @@ export const getPendingCollectionsPaginated = async (
         }
     });
 
-    const relevantCustomerIds = Object.keys(pendingMap).filter(id => pendingMap[id] > 0);
+    const allCustomerIds = Object.keys(pendingMap);
+
+    if (allCustomerIds.length === 0) return { data: [], count: 0 };
+
+    // Step 3: Subtract already-collected payments for these customers
+    const { data: existingCollections } = await supabase
+        .from('collections')
+        .select('customer_id, amount')
+        .in('customer_id', allCustomerIds);
+
+    if (existingCollections) {
+        existingCollections.forEach(col => {
+            if (col.customer_id && pendingMap[col.customer_id] !== undefined) {
+                pendingMap[col.customer_id] -= Number(col.amount) || 0;
+            }
+        });
+    }
+
+    const relevantCustomerIds = allCustomerIds.filter(id => pendingMap[id] > 0);
 
     if (relevantCustomerIds.length === 0) return { data: [], count: 0 };
 
-    // Step 3: Fetch Customer Details (with Search)
+    // Step 4: Fetch Customer Details (with Search)
     let customerQuery = supabase
         .from('customers')
         .select('*')
@@ -941,7 +960,7 @@ export const getPendingCollectionsPaginated = async (
 
     if (!customers) return { data: [], count: 0 };
 
-    // Step 4: Map, Sort
+    // Step 5: Map, Sort
     const finalResults = customers
         .map(c => ({
             ...c,
@@ -956,10 +975,12 @@ export const getPendingCollectionsPaginated = async (
     const from = (page - 1) * pageSize;
     const to = from + pageSize;
     const data = finalResults.slice(from, to);
+    const totalAmount = finalResults.reduce((sum, c) => sum + (c.pending || 0), 0);
 
     return {
         data,
-        count: totalCount
+        count: totalCount,
+        totalAmount
     };
 };
 
@@ -1101,8 +1122,7 @@ export const getDailyPersonnelSummary = async (date: string, showBalanceOnly: bo
     ] = await Promise.allSettled([
         supabase
             .from('personnel')
-            .select('id,full_name,role,status,current_balance') // phone might be needed for UI, adding * would be safer or add phone to select
-            .select('*') // Let's select * to be safe for UI props like phone
+            .select('*')
             .order('full_name', { ascending: true }),
         supabase
             .from('payroll_records')
@@ -1426,6 +1446,7 @@ export const createWorkOrder = async (workOrder: any) => {
 
         if (assignmentError) {
             console.error("Error creating assignments:", assignmentError);
+            throw assignmentError;
         }
     }
 
@@ -1458,10 +1479,7 @@ export const updateWorkOrder = async (id: string, workOrder: any) => {
     }
     if (!data) throw new Error("İş emri güncellenemedi (Kayıt bulunamadı?)");
 
-    if (error) throw error;
-
     // 2. Sync personnel assignments (Delete all existing, then insert new)
-    // First, delete existing
     const { error: deleteError } = await supabase
         .from('work_order_assignments')
         .delete()
@@ -1469,10 +1487,9 @@ export const updateWorkOrder = async (id: string, workOrder: any) => {
 
     if (deleteError) {
         console.error("Error deleting old assignments:", deleteError);
-        // proceed anyway to try inserting new ones
+        throw deleteError;
     }
 
-    // Now insert new if any
     if (workOrder.assigned_staff && Array.isArray(workOrder.assigned_staff) && workOrder.assigned_staff.length > 0) {
         const assignments = workOrder.assigned_staff.map((staffId: any) => ({
             work_order_id: id,
@@ -1485,6 +1502,7 @@ export const updateWorkOrder = async (id: string, workOrder: any) => {
 
         if (assignmentError) {
             console.error("Error saving new assignments:", assignmentError);
+            throw assignmentError;
         }
     }
 
@@ -1633,6 +1651,17 @@ export const getDailyTransactions = async (date: string) => {
     };
 };
 
+const recalculateCustomerBalance = async (customerId: string) => {
+    const [{ data: workOrders }, { data: collections }] = await Promise.all([
+        supabase.from('work_orders').select('price').eq('customer_id', customerId).eq('status', 'onaylandı'),
+        supabase.from('collections').select('amount').eq('customer_id', customerId)
+    ]);
+    const totalDebt = (workOrders || []).reduce((acc, w) => acc + (Number(w.price) || 0), 0);
+    const totalPaid = (collections || []).reduce((acc, c) => acc + (Number(c.amount) || 0), 0);
+    const newBalance = totalDebt - totalPaid;
+    await supabase.from('customers').update({ current_balance: newBalance }).eq('id', customerId);
+};
+
 export const createCollection = async (data: any) => {
     // Validate
     if (!data.customer_id) throw new Error("Müşteri seçilmeli");
@@ -1645,18 +1674,23 @@ export const createCollection = async (data: any) => {
         console.error("Create Col Error:", error);
         throw error;
     }
+    await recalculateCustomerBalance(data.customer_id);
     return true;
 };
 
 export const updateCollection = async (id: number | string, data: any) => {
+    const { data: existing } = await supabase.from('collections').select('customer_id').eq('id', id).single();
     const { error } = await supabase.from('collections').update(data).eq('id', id);
     if (error) throw error;
+    if (existing?.customer_id) await recalculateCustomerBalance(existing.customer_id);
     return true;
 };
 
 export const deleteCollection = async (id: number | string) => {
+    const { data: existing } = await supabase.from('collections').select('customer_id').eq('id', id).single();
     const { error } = await supabase.from('collections').delete().eq('id', id);
     if (error) throw error;
+    if (existing?.customer_id) await recalculateCustomerBalance(existing.customer_id);
     return true;
 };
 
