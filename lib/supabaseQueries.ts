@@ -60,6 +60,7 @@ export interface DailyPersonnelComputed {
     odenen: number
     bakiye: number
     recordId: string | undefined
+    isOnLeave: boolean
 }
 
 export interface DashboardStats {
@@ -1118,7 +1119,8 @@ export const getDailyPersonnelSummary = async (date: string, showBalanceOnly: bo
         personnelRes,
         todayPayrollRes,
         prevPayrollRes,
-        workOrdersRes
+        workOrdersRes,
+        leavesRes
     ] = await Promise.allSettled([
         supabase
             .from('personnel')
@@ -1137,6 +1139,10 @@ export const getDailyPersonnelSummary = async (date: string, showBalanceOnly: bo
             .select('id,date,description,address,price,work_order_assignments(personnel_id,personnel(id,full_name)),customers(id,name)')
             .eq('date', date)
             .order('date', { ascending: false }),
+        supabase
+            .from('personnel_leaves')
+            .select('personnel_id')
+            .eq('date', date),
     ]);
 
     // Data Extraction
@@ -1155,6 +1161,12 @@ export const getDailyPersonnelSummary = async (date: string, showBalanceOnly: bo
     const workOrders = workOrdersRes.status === 'fulfilled' && !workOrdersRes.value.error
         ? (workOrdersRes.value.data as unknown as WorkOrderRow[])
         : [];
+
+    const leavePersonnelIds = new Set<string>(
+        leavesRes.status === 'fulfilled' && !leavesRes.value.error
+            ? (leavesRes.value.data || []).map((r: any) => r.personnel_id)
+            : []
+    );
 
     // Devir (Carryover) Calculation
     const carryoverByPersonnel = new Map<string, number>();
@@ -1222,7 +1234,8 @@ export const getDailyPersonnelSummary = async (date: string, showBalanceOnly: bo
             hakedis: today.daily_wage,
             odenen: today.paid_amount,
             bakiye: balance_after,
-            recordId: today.recordId
+            recordId: today.recordId,
+            isOnLeave: leavePersonnelIds.has(p.id)
         };
     });
 
@@ -1231,8 +1244,11 @@ export const getDailyPersonnelSummary = async (date: string, showBalanceOnly: bo
         summary = summary.filter(p => p.balance_after !== 0);
     }
 
-    // 6. Sort
+    // 6. Sort: leaves first, then working, then balance, then alphabetical
     summary.sort((a, b) => {
+        if (a.isOnLeave && !b.isOnLeave) return -1;
+        if (!a.isOnLeave && b.isOnLeave) return 1;
+
         const aWorking = a.job !== '-';
         const bWorking = b.job !== '-';
         if (aWorking && !bWorking) return -1;
@@ -1247,6 +1263,38 @@ export const getDailyPersonnelSummary = async (date: string, showBalanceOnly: bo
     });
 
     return summary;
+};
+
+// --- Personnel Leaves ---
+
+export const getPersonnelLeaves = async (date: string): Promise<{ id: string; personnel_id: string; name: string }[]> => {
+    const { data, error } = await supabase
+        .from('personnel_leaves')
+        .select('id, personnel_id, personnel(id, full_name)')
+        .eq('date', date);
+
+    if (error) throw error;
+    return (data || []).map((row: any) => ({
+        id: row.id,
+        personnel_id: row.personnel_id,
+        name: row.personnel?.full_name || ''
+    }));
+};
+
+export const setPersonnelLeaves = async (date: string, personnelIds: string[]): Promise<void> => {
+    // Delete existing leaves for this date
+    const { error: delError } = await supabase
+        .from('personnel_leaves')
+        .delete()
+        .eq('date', date);
+    if (delError) throw delError;
+
+    if (personnelIds.length === 0) return;
+
+    const { error: insError } = await supabase
+        .from('personnel_leaves')
+        .insert(personnelIds.map(pid => ({ personnel_id: pid, date })));
+    if (insError) throw insError;
 };
 
 // --- Mutations ---

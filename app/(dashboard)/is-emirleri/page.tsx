@@ -3,11 +3,11 @@
 
 
 import { Header } from "@/components/Header";
-import { Plus, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Trash2, ChevronLeft, ChevronRight, BedDouble, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { NewJobModal } from "@/components/NewJobModal";
-import { getWorkOrders, supabase } from "@/lib/supabaseQueries";
+import { getWorkOrders, getPersonnelLeaves, setPersonnelLeaves, supabase } from "@/lib/supabaseQueries";
 import { toast } from "sonner";
 
 import { useUserRole } from "@/hooks/useUserRole";
@@ -22,6 +22,7 @@ function IsEmirleriContent() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [jobs, setJobs] = useState<any[]>([]);
   const [editingJob, setEditingJob] = useState<any>(null);
+  const [leavePersonnel, setLeavePersonnel] = useState<{ id: string; personnel_id: string; name: string }[]>([]);
 
   // Pagination
   const [page, setPage] = useState(1);
@@ -34,9 +35,13 @@ function IsEmirleriContent() {
   async function fetchJobs() {
     setLoading(true);
     try {
-      const { data, count } = await getWorkOrders(page, pageSize, '', selectedDate); // Search param empty for now
+      const [{ data, count }, leaves] = await Promise.all([
+        getWorkOrders(page, pageSize, '', selectedDate),
+        getPersonnelLeaves(selectedDate)
+      ]);
       setJobs(data || []);
       setTotalCount(count || 0);
+      setLeavePersonnel(leaves);
     } catch (error) {
       console.error("Error fetching jobs:", error);
     } finally {
@@ -82,6 +87,17 @@ function IsEmirleriContent() {
 
   const canDelete = hasPermission(role || undefined, PERMISSIONS.CAN_DELETE);
 
+  const handleRemoveLeave = async (personnelId: string) => {
+    const updated = leavePersonnel.filter(lp => lp.personnel_id !== personnelId);
+    try {
+      await setPersonnelLeaves(selectedDate, updated.map(lp => lp.personnel_id));
+      setLeavePersonnel(updated);
+      toast.success("İzin kaydı silindi.");
+    } catch (e: any) {
+      toast.error("Silinemedi: " + e.message);
+    }
+  };
+
   return (
     <>
       <Header title="İş Emirleri" />
@@ -115,6 +131,31 @@ function IsEmirleriContent() {
             </button>
           </div>
         </div>
+
+        {/* İzinli Personel Section */}
+        {leavePersonnel.length > 0 && (
+          <div className="rounded-xl border border-amber-200 bg-amber-50 shadow-sm p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <BedDouble className="h-4 w-4 text-amber-600" />
+              <h3 className="text-sm font-bold text-amber-800">İzinli Personel — {new Date(selectedDate + 'T00:00:00').toLocaleDateString('tr-TR')}</h3>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {leavePersonnel.map(lp => (
+                <span key={lp.id} className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 border border-amber-300 px-3 py-1 text-xs font-bold text-amber-800">
+                  <BedDouble className="h-3 w-3" />
+                  {lp.name}
+                  <button
+                    onClick={() => handleRemoveLeave(lp.personnel_id)}
+                    className="ml-0.5 rounded-full p-0.5 hover:bg-amber-300 transition-colors"
+                    title="İzni sil"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Jobs List */}
         <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-6 min-h-[500px]">

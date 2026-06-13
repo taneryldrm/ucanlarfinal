@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
-import { Search, Calendar, Filter, Loader2 } from "lucide-react";
+import { Search, Calendar, Filter, Loader2, BedDouble } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WageEditModal } from "@/components/WageEditModal";
 import { getDailyPersonnelSummary, upsertPayrollRecord } from "@/lib/supabaseQueries";
@@ -157,8 +157,18 @@ export default function PersonelYevmiyePage() {
                   </tr>
                 ) : (
                   filteredList.map((person) => (
-                    <tr key={person.id} className="group hover:bg-slate-50/50 transition-colors">
-                      <td className="px-4 py-4 font-bold text-slate-800 uppercase text-xs">{person.name}</td>
+                    <tr key={person.id} className={cn("group hover:bg-slate-50/50 transition-colors", person.isOnLeave && "bg-amber-50/40")}>
+                      <td className="px-4 py-4 font-bold text-slate-800 uppercase text-xs">
+                        <div className="flex items-center gap-2">
+                          {person.name}
+                          {person.isOnLeave && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-700 border border-amber-200">
+                              <BedDouble className="h-3 w-3" />
+                              İzinli
+                            </span>
+                          )}
+                        </div>
+                      </td>
                       <td className="px-4 py-4 font-medium text-slate-900 text-xs">{person.phone || '-'}</td>
                       <td className="px-4 py-4 text-slate-600 text-xs">{person.job}</td>
                       <td className="px-4 py-4 text-right font-bold text-slate-600">

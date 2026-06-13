@@ -175,7 +175,6 @@ export default function MusterilerPage() {
                   <th className="px-6 py-4 font-medium">Müşteri Adı</th>
                   <th className="px-6 py-4 font-medium">Tip</th>
                   <th className="px-6 py-4 font-medium">Telefon</th>
-                  <th className="px-6 py-4 font-medium">Adres</th>
                   <th className="px-6 py-4 font-medium">Bakiye</th>
                   <th className="px-6 py-4 text-center font-medium">İşlemler</th>
                 </tr>
@@ -183,13 +182,13 @@ export default function MusterilerPage() {
               <tbody className="divide-y divide-border">
                 {loading ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-8 text-center text-muted-foreground">
+                    <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">
                       Yükleniyor...
                     </td>
                   </tr>
                 ) : customers.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-8 text-center text-muted-foreground">
+                    <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">
                       Müşteri bulunamadı.
                     </td>
                   </tr>
@@ -208,9 +207,6 @@ export default function MusterilerPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 font-medium text-foreground">{customer.phone}</td>
-                      <td className="px-6 py-4 text-muted-foreground max-w-xs truncate" title={customer.address}>
-                        {customer.address}
-                      </td>
                       <td className="px-6 py-4 font-bold text-foreground">
                         ₺{(customer.current_balance || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
                       </td>

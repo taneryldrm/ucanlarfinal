@@ -102,12 +102,15 @@ export default function Home() {
         // Adding 'role' dependency ensures it refetches or cancels correctly.
         if (role !== null) {
             loadDashboardData();
-        } else if (!loading && role === null) {
-            // Safety Net: If loading is done but role is null (and we are on a protected page), force login
-            // This catches cases where middleware might have let a "ghost" user through.
+        }
+    }, [role, isDriver]);
+
+    // Safety net: redirect to login if loading is done but role is still null
+    useEffect(() => {
+        if (!loading && role === null) {
             router.push('/login');
         }
-    }, [role, isDriver, loading, router]);
+    }, [loading, role, router]);
 
     // Handle Click Outside to close search results
     useEffect(() => {

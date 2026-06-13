@@ -1,9 +1,9 @@
 "use client";
 
-import { X, Search, Plus, Calendar, Loader2 } from "lucide-react";
+import { X, Search, Plus, Calendar, Loader2, BedDouble } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
-import { getCustomers, getPersonnel } from "@/lib/supabaseQueries";
+import { getCustomers, getPersonnel, getPersonnelLeaves, setPersonnelLeaves } from "@/lib/supabaseQueries";
 import { toast } from "sonner";
 import { NewCustomerModal } from "./NewCustomerModal";
 import { NewPersonnelModal } from "./NewPersonnelModal";
@@ -29,6 +29,12 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
     // New Personnel Modal State
     const [isNewPersonnelModalOpen, setIsNewPersonnelModalOpen] = useState(false);
 
+    // Leave Personnel State
+    const [showLeavePanel, setShowLeavePanel] = useState(false);
+    const [leaveStaffIds, setLeaveStaffIds] = useState<string[]>([]);
+    const [leaveSearch, setLeaveSearch] = useState("");
+    const [isSavingLeaves, setIsSavingLeaves] = useState(false);
+
     // Staff Search State
     const [staffSearch, setStaffSearch] = useState("");
     const [foundStaff, setFoundStaff] = useState<any[]>([]);
@@ -53,6 +59,7 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
         d.setMonth(d.getMonth() + 3);
         return d.toISOString().split('T')[0];
     });
+    const [monthDay, setMonthDay] = useState("1");
 
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -64,6 +71,15 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
             });
         }
     }, [isOpen]);
+
+    // Load existing leaves when date changes
+    useEffect(() => {
+        if (isOpen && date) {
+            getPersonnelLeaves(date).then(leaves => {
+                setLeaveStaffIds(leaves.map(l => l.personnel_id));
+            }).catch(() => {});
+        }
+    }, [isOpen, date]);
 
     // Sync state with initialData when modal opens
     useEffect(() => {
@@ -166,6 +182,24 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
         );
     };
 
+    const toggleLeaveStaff = (id: string) => {
+        setLeaveStaffIds(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]);
+    };
+
+    const handleSaveLeaves = async () => {
+        if (!date) return;
+        setIsSavingLeaves(true);
+        try {
+            await setPersonnelLeaves(date, leaveStaffIds);
+            toast.success("İzinli personel kaydedildi.");
+            setShowLeavePanel(false);
+        } catch (e: any) {
+            toast.error("Hata: " + e.message);
+        } finally {
+            setIsSavingLeaves(false);
+        }
+    };
+
     const toggleDay = (day: string, maxSelection: number) => {
         setSelectedDays(prev => {
             if (prev.includes(day)) {
@@ -198,7 +232,7 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
             personnel_count: staffCount,
             is_recurring: isRecurring,
             frequency: isRecurring ? frequency : null,
-            recurring_days: isRecurring ? selectedDays : [],
+            recurring_days: isRecurring ? (frequency === 'once_month' ? [monthDay] : selectedDays) : [],
             recurring_end_date: isRecurring ? recurringEndDate : null,
             assigned_staff: selectedStaffIds
         };
@@ -407,6 +441,87 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                         </div>
                     </div>
 
+                    {/* İzinli Personel */}
+                    <div className="space-y-2 border-t border-slate-100 pt-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <BedDouble className="h-4 w-4 text-amber-500" />
+                                <label className="text-sm font-bold text-slate-900">İzinli Personel</label>
+                                {leaveStaffIds.length > 0 && (
+                                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-700">
+                                        {leaveStaffIds.length} kişi
+                                    </span>
+                                )}
+                            </div>
+                            <button
+                                onClick={() => setShowLeavePanel(v => !v)}
+                                className="flex items-center gap-1 rounded border border-amber-300 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 hover:bg-amber-100"
+                            >
+                                <BedDouble className="h-3 w-3" />
+                                İzinli Personel Gir
+                            </button>
+                        </div>
+
+                        {showLeavePanel && (
+                            <div className="rounded-lg border border-amber-200 bg-amber-50/30 p-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                                    <input
+                                        type="text"
+                                        value={leaveSearch}
+                                        onChange={(e) => setLeaveSearch(e.target.value)}
+                                        placeholder="Personel ara..."
+                                        className="w-full rounded-lg border border-slate-200 py-2 pl-10 pr-4 text-sm outline-none focus:border-amber-400"
+                                    />
+                                </div>
+                                <div className="space-y-2 max-h-40 overflow-y-auto pr-2">
+                                    {foundStaff
+                                        .filter(s => (s.full_name || s.name)?.toLowerCase().includes(leaveSearch.toLowerCase()))
+                                        .map((staff) => (
+                                            <label key={staff.id} className="flex items-center gap-3 p-2 rounded hover:bg-amber-50 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={leaveStaffIds.includes(staff.id)}
+                                                    onChange={() => toggleLeaveStaff(staff.id)}
+                                                    className="h-4 w-4 rounded border-slate-300 text-amber-500 focus:ring-amber-400"
+                                                />
+                                                <span className="text-sm font-medium text-slate-700">{staff.full_name || staff.name}</span>
+                                            </label>
+                                        ))}
+                                </div>
+                                <div className="flex justify-end gap-2 pt-1">
+                                    <button
+                                        onClick={() => setShowLeavePanel(false)}
+                                        className="rounded border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                                    >
+                                        İptal
+                                    </button>
+                                    <button
+                                        onClick={handleSaveLeaves}
+                                        disabled={isSavingLeaves}
+                                        className="flex items-center gap-1 rounded bg-amber-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-600 disabled:opacity-50"
+                                    >
+                                        {isSavingLeaves ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+                                        Kaydet
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {!showLeavePanel && leaveStaffIds.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5">
+                                {foundStaff
+                                    .filter(s => leaveStaffIds.includes(s.id))
+                                    .map(s => (
+                                        <span key={s.id} className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-700">
+                                            <BedDouble className="h-3 w-3" />
+                                            {s.full_name || s.name}
+                                        </span>
+                                    ))}
+                            </div>
+                        )}
+                    </div>
+
                     {/* Açıklama ve Adres */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
@@ -426,8 +541,7 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                                     <select
                                         className="text-xs border border-slate-200 rounded px-2 py-1 outline-none focus:border-blue-500 max-w-[150px] truncate"
                                         onChange={(e) => setAddress(e.target.value)}
-                                        value={""} // Always show placeholder behavior, or manage state properly? 
-                                    // Better: "Adres Seç" option as first
+                                        value={availableAddresses.includes(address) ? address : ""}
                                     >
                                         <option value="" disabled>Kayıtlı Adresler</option>
                                         {availableAddresses.map((addr, i) => (
@@ -493,6 +607,7 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                                         onChange={(e) => setFrequency(e.target.value)}
                                         className="w-full appearance-none rounded-lg border border-slate-200 bg-slate-800 text-white px-4 py-2.5 text-sm outline-none focus:border-blue-500"
                                     >
+                                        <option value="every_day">Hergün</option>
                                         <option value="once_week">Haftada 1</option>
                                         <option value="twice_week">Haftada 2</option>
                                         <option value="once_month">Ayda 1</option>
@@ -560,24 +675,17 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
                                 {frequency === 'once_month' && (
                                     <div className="space-y-2">
                                         <label className="text-sm font-bold text-slate-900">Gün Seçimi</label>
-                                        <select className="w-full appearance-none rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-blue-500">
+                                        <select
+                                            value={monthDay}
+                                            onChange={(e) => setMonthDay(e.target.value)}
+                                            className="w-full appearance-none rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-blue-500"
+                                        >
                                             {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
-                                                <option key={day} value={day}>{day}. Gün</option>
+                                                <option key={day} value={String(day)}>{day}. Gün</option>
                                             ))}
                                         </select>
                                     </div>
                                 )}
-
-                                {/* Bitiş Tarihi */}
-                                <div className="space-y-2">
-                                    <label className="text-sm font-bold text-slate-900">
-                                        Bitiş Tarihi <span className="text-xs font-normal text-slate-500">(Opsiyonel)</span>
-                                    </label>
-                                    <input
-                                        type="date"
-                                        className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
-                                    />
-                                </div>
                             </div>
                         )}
                     </div>

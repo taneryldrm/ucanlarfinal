@@ -7,10 +7,9 @@ export async function updateUserPassword(userId: string, newPassword: string) {
     console.log("updateUserPassword called for userId:", userId);
 
     try {
-        // 0. Safe Check Env Vars
-        // HARDCODED FALLBACK FOR HOSTINGER DEPLOYMENT ISSUE
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://rzcumzfzurthasgptggd.supabase.co";
-        const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6Y3VtemZ6dXJ0aGFzZ3B0Z2dkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NjE0MDkzNiwiZXhwIjoyMDgxNzE2OTM2fQ.khEBONqMDlfciX2UWYtFq5OKpBePBxycg7vvTibhSXU";
+        // 0. Check Env Vars
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
         if (!supabaseUrl) {
             console.error("Missing Env Var: NEXT_PUBLIC_SUPABASE_URL");
@@ -18,8 +17,7 @@ export async function updateUserPassword(userId: string, newPassword: string) {
         }
         if (!serviceRoleKey) {
             console.error("Missing Env Var: SUPABASE_SERVICE_ROLE_KEY");
-            const availableKeys = Object.keys(process.env).filter(k => k.startsWith('NEXT_') || k.startsWith('SUPABASE_') || k === 'NODE_ENV').join(', ');
-            return { success: false, message: `Sunucu hatası: SUPABASE_SERVICE_ROLE_KEY eksik. Mevcut anahtarlar: ${availableKeys}` };
+            return { success: false, message: "Sunucu hatası: SUPABASE_SERVICE_ROLE_KEY eksik." };
         }
 
         // 1. Check if the requester is an Admin
@@ -79,10 +77,9 @@ export async function updateUserPassword(userId: string, newPassword: string) {
 
 export async function createUser(userData: any) {
     try {
-        // 0. Safe Check Env Vars
-        // HARDCODED FALLBACK FOR HOSTINGER DEPLOYMENT ISSUE
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://rzcumzfzurthasgptggd.supabase.co";
-        const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6Y3VtemZ6dXJ0aGFzZ3B0Z2dkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NjE0MDkzNiwiZXhwIjoyMDgxNzE2OTM2fQ.khEBONqMDlfciX2UWYtFq5OKpBePBxycg7vvTibhSXU";
+        // 0. Check Env Vars
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
         if (!supabaseUrl) {
             console.error("Missing Env Var: NEXT_PUBLIC_SUPABASE_URL");

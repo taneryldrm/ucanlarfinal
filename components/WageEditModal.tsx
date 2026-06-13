@@ -138,7 +138,7 @@ export function WageEditModal({ isOpen, onClose, initialData, onSave }: WageEdit
                             <span className="font-bold text-slate-700">Yeni Bakiye</span>
                             <span className={cn(
                                 "text-2xl font-black",
-                                formData.bakiye > 0 ? "text-red-600" : "text-green-600"
+                                formData.bakiye > 0 ? "text-green-600" : "text-red-600"
                             )}>
                                 ₺{formData.bakiye.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
                             </span>
