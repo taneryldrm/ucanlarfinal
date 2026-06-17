@@ -5,11 +5,12 @@ import { Header } from "@/components/Header";
 import { Search, Calendar, Filter, Loader2, BedDouble } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WageEditModal } from "@/components/WageEditModal";
-import { getDailyPersonnelSummary, upsertPayrollRecord } from "@/lib/supabaseQueries";
+import { getDailyPersonnelSummary, upsertPayrollRecord, getPersonnelLeaves } from "@/lib/supabaseQueries";
 import { toast } from "sonner";
 
 export default function PersonelYevmiyePage() {
   const [wageList, setWageList] = useState<any[]>([]);
+  const [leavePersonnel, setLeavePersonnel] = useState<{ id: string; personnel_id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingWage, setEditingWage] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,8 +23,12 @@ export default function PersonelYevmiyePage() {
   async function fetchData() {
     setLoading(true);
     try {
-      const data = await getDailyPersonnelSummary(selectedDate, showBalanceOnly);
+      const [data, leaves] = await Promise.all([
+        getDailyPersonnelSummary(selectedDate, showBalanceOnly),
+        getPersonnelLeaves(selectedDate),
+      ]);
       setWageList(data);
+      setLeavePersonnel(leaves);
     } catch (error) {
       console.error("Error fetching wages:", error);
       toast.error("Veriler yüklenirken hata oluştu.");
@@ -125,6 +130,24 @@ export default function PersonelYevmiyePage() {
             </button>
 
           </div>
+
+          {/* İzinli Personel Section */}
+          {leavePersonnel.length > 0 && (
+            <div className="rounded-xl border border-amber-200 bg-amber-50 shadow-sm p-4 mb-4">
+              <div className="flex items-center gap-2 mb-3">
+                <BedDouble className="h-4 w-4 text-amber-600" />
+                <h3 className="text-sm font-bold text-amber-800">İzinli Personel — {new Date(selectedDate + 'T00:00:00').toLocaleDateString('tr-TR')}</h3>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {leavePersonnel.map(lp => (
+                  <span key={lp.id} className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 border border-amber-300 px-3 py-1 text-xs font-bold text-amber-800">
+                    <BedDouble className="h-3 w-3" />
+                    {lp.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Yevmiye Table */}
           <div className="overflow-x-auto">

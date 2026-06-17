@@ -239,6 +239,8 @@ export function NewJobModal({ isOpen, onClose, initialData, onSave }: NewJobModa
 
         try {
             console.log("Saving payload:", payload);
+            // Save izinli personel for this date alongside the work order
+            await setPersonnelLeaves(date, leaveStaffIds);
             if (onSave) {
                 await onSave(payload);
                 onClose();

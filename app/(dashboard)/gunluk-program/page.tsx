@@ -1,10 +1,10 @@
 "use client";
 
 import { Header } from "@/components/Header";
-import { Printer, Calendar, Clock, Users, Check, CheckCircle2 } from "lucide-react";
+import { Printer, Calendar, Clock, Users, Check, CheckCircle2, BedDouble } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
-import { getWorkOrders, approveWorkOrder } from "@/lib/supabaseQueries";
+import { getWorkOrders, approveWorkOrder, getPersonnelLeaves } from "@/lib/supabaseQueries";
 import { useUserRole } from "@/hooks/useUserRole";
 import { hasPermission, PERMISSIONS } from "@/lib/rbac";
 import { toast } from "sonner";
@@ -13,6 +13,7 @@ export default function GunlukProgramPage() {
   // Default to today
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [jobs, setJobs] = useState<any[]>([]);
+  const [leavePersonnel, setLeavePersonnel] = useState<{ id: string; personnel_id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedJob, setSelectedJob] = useState<any>(null);
 
@@ -23,9 +24,12 @@ export default function GunlukProgramPage() {
   const fetchDailyJobs = async () => {
     setLoading(true);
     try {
-      // Fetch all jobs for the date (pageSize 100 to be safe for a day view)
-      const { data } = await getWorkOrders(1, 100, "", selectedDate);
+      const [{ data }, leaves] = await Promise.all([
+        getWorkOrders(1, 100, "", selectedDate),
+        getPersonnelLeaves(selectedDate),
+      ]);
       setJobs(data || []);
+      setLeavePersonnel(leaves);
     } catch (error) {
       console.error("Error fetching daily jobs:", error);
       toast.error("Günlük işler yüklenirken hata oluştu.");
@@ -107,6 +111,24 @@ export default function GunlukProgramPage() {
               </div>
             </div>
           </div>
+
+          {/* İzinli Personel Section */}
+          {leavePersonnel.length > 0 && (
+            <div className="rounded-xl border border-amber-200 bg-amber-50 shadow-sm p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <BedDouble className="h-4 w-4 text-amber-600" />
+                <h3 className="text-sm font-bold text-amber-800">İzinli Personel — {new Date(selectedDate + 'T00:00:00').toLocaleDateString('tr-TR')}</h3>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {leavePersonnel.map(lp => (
+                  <span key={lp.id} className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 border border-amber-300 px-3 py-1 text-xs font-bold text-amber-800">
+                    <BedDouble className="h-3 w-3" />
+                    {lp.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -373,6 +395,16 @@ export default function GunlukProgramPage() {
             ))}
           </tbody>
         </table>
+
+        {/* İzinli Personel - Print Only */}
+        {leavePersonnel.length > 0 && (
+          <div className="mt-4 border border-black p-2">
+            <div className="font-bold text-[10px] mb-1">İZİNLİ PERSONEL:</div>
+            <div className="text-[10px]">
+              {leavePersonnel.map(lp => lp.name).join(', ')}
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
